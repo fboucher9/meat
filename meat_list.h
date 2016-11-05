@@ -33,9 +33,6 @@ struct meat_list
     struct meat_list *
         p_prev;
 
-    void *
-        p_data;
-
 }; /* struct meat_list */
 
 #if defined(__cplusplus)
@@ -53,23 +50,6 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_list_init(
-    struct meat_list * const
-        p_node,
-    void * const
-        p_data);
-
-#if defined(__cplusplus)
-extern "C"
-#endif /* #if defined(__cplusplus) */
-struct meat_list *
-meat_list_alloc(
-    void * p_data);
-
-#if defined(__cplusplus)
-extern "C"
-#endif /* #if defined(__cplusplus) */
-void
-meat_list_free(
     struct meat_list * const
         p_node);
 

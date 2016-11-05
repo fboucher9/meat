@@ -28,8 +28,7 @@ o_meat_heap_list =
     &(
         o_meat_heap_list),
     &(
-        o_meat_heap_list),
-    (void *)(0)
+        o_meat_heap_list)
 };
 
 /*
@@ -158,9 +157,7 @@ meat_heap_alloc(
 
             meat_list_init(
                 &(
-                    p_prefix->o_list),
-                (void *)(
-                    p_body));
+                    p_prefix->o_list));
 
             backtrace(
                 p_prefix->a_stack,
