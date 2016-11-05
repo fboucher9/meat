@@ -1,3 +1,13 @@
+/* See LICENSE for license details. */
+
+/*
+
+Module: meat_time.c
+
+Description:
+
+*/
+
 #include "meat_os.h"
 
 #include "meat_time.h"

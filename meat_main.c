@@ -1,3 +1,12 @@
+/* See LICENSE for license details. */
+
+/*
+
+Module: meat_main.c
+
+Description:
+
+*/
 
 #include "meat_os.h"
 

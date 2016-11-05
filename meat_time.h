@@ -1,3 +1,12 @@
+/* See LICENSE for license details. */
+
+/*
+
+Module: meat_time.h
+
+Description:
+
+*/
 
 signed long int
     offset_seconds(
@@ -161,3 +170,4 @@ which_wday(
     char const * const
         p_arg);
 
+/* end-of-file: meat_time.h */

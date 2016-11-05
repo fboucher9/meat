@@ -1,3 +1,12 @@
+/* See LICENSE for license details. */
+
+/*
+
+Module: meat_main.h
+
+Description:
+
+*/
 
 int
     meat_main(
@@ -6,3 +15,4 @@ int
         char const * const * const
             argv);
 
+/* end-of-file: meat_main.h */
