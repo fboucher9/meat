@@ -19,7 +19,7 @@ MEAT_CFLAGS := $(CFLAGS) -ansi -pedantic -Wall -Wextra -g -O0 -I$(MEAT_DST_PATH)
 endif
 
 ifndef MEAT_LDFLAGS
-MEAT_LDFLAGS := $(LDFLAGS)
+MEAT_LDFLAGS := $(LDFLAGS) -rdynamic
 endif
 
 MEAT_SRCS := \
@@ -27,7 +27,8 @@ MEAT_SRCS := \
     $(MEAT_DST_PATH)/_obj_meat_main.o \
     $(MEAT_DST_PATH)/_obj_meat_list.o \
     $(MEAT_DST_PATH)/_obj_meat_heap.o \
-    $(MEAT_DST_PATH)/_obj_meat_time.o
+    $(MEAT_DST_PATH)/_obj_meat_time.o \
+    $(MEAT_DST_PATH)/_obj_meat_dbg.o
 
 .PHONY: all
 all: $(MEAT_DST_PATH)/meat

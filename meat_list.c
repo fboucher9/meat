@@ -34,9 +34,28 @@ meat_list_join(
 
 } /* meat_list_join() */
 
+void
+meat_list_init(
+    struct meat_list * const
+        p_node,
+    void * const
+        p_data)
+{
+    p_node->p_next =
+        p_node;
+
+    p_node->p_prev =
+        p_node;
+
+    p_node->p_data =
+        p_data;
+
+} /* meat_list_init() */
+
 struct meat_list *
 meat_list_alloc(
-    void * p_data)
+    void * const
+        p_data)
 {
     struct meat_list *
         p_node;
@@ -50,14 +69,9 @@ meat_list_alloc(
     if (
         p_node)
     {
-        p_node->p_next =
-            p_node;
-
-        p_node->p_prev =
-            p_node;
-
-        p_node->p_data =
-            p_data;
+        meat_list_init(
+            p_node,
+            p_data);
     }
 
     return

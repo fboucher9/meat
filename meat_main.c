@@ -7,6 +7,8 @@
 
 #include "meat_main.h"
 
+#include "meat_heap.h"
+
 /*
 
 Interface:
@@ -40,9 +42,16 @@ Interface:
 
 */
 
-static
 struct meat_list
-o_game_list;
+o_game_list =
+{
+    &(
+        o_game_list),
+    &(
+        o_game_list),
+    (void *)(
+        0)
+};
 
 struct meat_game
 {
@@ -72,7 +81,6 @@ struct meat_game
 
 };
 
-static
 char *
 strip_trailing_spaces(
     char * const
@@ -99,7 +107,6 @@ strip_trailing_spaces(
     return p_buf;
 }
 
-static
 char const *
 skip_leading_spaces(
     char const * const
@@ -120,7 +127,6 @@ skip_leading_spaces(
     return p_iterator;
 }
 
-static
 char *
 dup_str(
     char const * const
@@ -137,7 +143,7 @@ dup_str(
             p_buf);
 
     p_buf_copy =
-        malloc(
+        meat_heap_alloc(
             i_buf_len + 1);
 
     if (
@@ -154,7 +160,6 @@ dup_str(
 }
 
 /* Load games from input file */
-static
 void
 load_games(
     FILE * p_input)
@@ -187,7 +192,7 @@ load_games(
         struct meat_game *
             p_game =
             (struct meat_game *)(
-                malloc(
+                meat_heap_alloc(
                     sizeof(
                         struct meat_game)));
 
@@ -323,7 +328,6 @@ load_games(
 }
 
 
-static
 void
 process_command(
     unsigned int const
@@ -757,6 +761,8 @@ int
     time_t
         i_range_end;
 
+    meat_heap_init();
+
     process_command(
         argc,
         argv,
@@ -869,6 +875,8 @@ int
     {
         printf("wha?\n");
     }
+
+    meat_heap_cleanup();
 
     return 0;
 
