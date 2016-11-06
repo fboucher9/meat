@@ -6,6 +6,8 @@ Module: meat_opts.c
 
 Description:
 
+    Command-line options.
+
 */
 
 #include "meat_os.h"
@@ -19,6 +21,21 @@ Description:
 Function: meat_opts_init
 
 Description:
+
+    Initialize the meat_opts structure by parsing the command-line options.
+
+Parameters:
+
+    p_opts
+        Pointer to meat_opts structure.
+    i_argc
+        Number of command-line arguments
+    p_argv
+        Array of command-line arguments
+
+Returns: None.
+
+Comments: None.
 
 */
 void
@@ -448,7 +465,9 @@ Description:
     Free resource and undo initialization performed by meat_opts_init().
 
 Parameters:
+
     p_opts
+
         Pointer to meat_opts structure.
 
 Returns:

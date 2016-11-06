@@ -53,4 +53,19 @@ meat_list_init(
     struct meat_list * const
         p_node);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+void
+meat_list_iterate(
+    struct meat_list * const
+        p_node,
+    void (* const p_callback)(
+        void * const
+            p_context,
+        struct meat_list * const
+            p_list),
+    void * const
+        p_context);
+
 /* end-of-file: meat_list.h */

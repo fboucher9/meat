@@ -47,4 +47,42 @@ meat_list_init(
 
 } /* meat_list_init() */
 
+void
+meat_list_iterate(
+    struct meat_list * const
+        p_node,
+    void (* const p_callback)(
+        void * const
+            p_context,
+        struct meat_list * const
+            p_list),
+    void * const
+        p_context)
+{
+    struct meat_list *
+        p_iterator;
+
+    p_iterator =
+        p_node->p_next;
+
+    while (
+        p_iterator
+        != p_node)
+    {
+        struct meat_list *
+            p_next;
+
+        p_next =
+            p_iterator->p_next;
+
+        (*p_callback)(
+            p_context,
+            p_iterator);
+
+        p_iterator =
+            p_next;
+    }
+
+} /* meat_list_iterate() */
+
 /* end-of-file: meat_list.c */
