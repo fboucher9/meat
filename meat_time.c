@@ -13,20 +13,6 @@ Description:
 #include "meat_time.h"
 
 signed long int
-    offset_seconds(
-        int const i_seconds)
-{
-    return ((signed long int)(i_seconds) * 1l);
-}
-
-signed long int
-    offset_hours(
-        int const i_hour)
-{
-    return ((signed long int)(i_hour) * 60l * 60l);
-}
-
-signed long int
     offset_minutes(
         int const i_minutes)
 {
@@ -34,26 +20,34 @@ signed long int
 }
 
 signed long int
-    offset_hour_min_sec(
+    offset_hours(
+        int const i_hour)
+{
+    return
+        offset_minutes(
+            i_hour * 60l);
+}
+
+signed long int
+    offset_time_of_day(
         int const i_hour,
-        int const i_minutes,
-        int const i_seconds)
+        int const i_minutes)
 {
     return
         (
             offset_hours(
                 i_hour)
             + offset_minutes(
-                i_minutes)
-            + offset_seconds(
-                i_seconds));
+                i_minutes));
 }
 
 signed long int
     offset_days(
         int const i_days)
 {
-    return ((signed long int)(i_days) * 60l * 60l * 24l);
+    return
+        offset_hours(
+            i_days * 24l);
 }
 
 signed long int
@@ -63,7 +57,6 @@ signed long int
     return
         offset_days(
             i_weeks * 7);
-
 }
 
 signed long int
@@ -79,8 +72,6 @@ signed long int
 time_t
     init_day(
         int const
-            i_seconds,
-        int const
             i_minutes,
         int const
             i_hour,
@@ -95,7 +86,7 @@ time_t
         o_descriptor;
 
     o_descriptor.tm_sec =
-        i_seconds;
+        0;
 
     o_descriptor.tm_min =
         i_minutes;
@@ -168,10 +159,9 @@ time_t
 
     return
         i_now
-        - offset_hour_min_sec(
+        - offset_time_of_day(
             o_now.tm_hour,
-            o_now.tm_min,
-            o_now.tm_sec);
+            o_now.tm_min);
 
 }
 
@@ -232,10 +222,9 @@ time_t
 
     return
         i_now
-        - offset_hour_min_sec(
+        - offset_time_of_day(
             o_now.tm_hour,
-            o_now.tm_min,
-            o_now.tm_sec)
+            o_now.tm_min)
         - offset_days(
             o_now.tm_mday - 1);
 

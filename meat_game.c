@@ -140,7 +140,6 @@ char
 
             p_game->i_game_time =
                 init_day(
-                    0,
                     minute,
                     hour,
                     day,

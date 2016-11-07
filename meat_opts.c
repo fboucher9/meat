@@ -406,7 +406,6 @@ void
                 i_random_day_of_month =
                     init_day(
                         0,
-                        0,
                         12,
                         11,
                         i_month,
@@ -416,7 +415,6 @@ void
             {
                 i_random_day_of_month =
                     init_day(
-                        0,
                         0,
                         12,
                         11,

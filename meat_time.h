@@ -8,9 +8,38 @@ Description:
 
 */
 
-signed long int
-    offset_seconds(
-        int const i_seconds);
+/* Header file dependency */
+#if !defined(INC_MEAT_OS_H)
+#error include meat_os.h first
+#endif /* #if !defined(INC_MEAT_OS_H) */
+
+#if defined(INC_MEAT_TIME_H)
+#error include meat_time.h once
+#endif /* #if defined(INC_MEAT_TIME_H) */
+
+#if 0
+struct meat_time_info
+{
+    int
+        i_minute;
+
+    int
+        i_hour;
+
+    int
+        i_day_of_month;
+
+    int
+        i_day_of_week;
+
+    int
+        i_month;
+
+    int
+        i_year;
+
+}; /* struct meat_time_info */
+#endif
 
 signed long int
     offset_hours(
@@ -21,10 +50,9 @@ signed long int
         int const i_minutes);
 
 signed long int
-    offset_hour_min_sec(
+    offset_time_of_day(
         int const i_hour,
-        int const i_minutes,
-        int const i_seconds);
+        int const i_minutes);
 
 signed long int
     offset_days(
@@ -40,8 +68,6 @@ signed long int
 
 time_t
     init_day(
-        int const
-            i_seconds,
         int const
             i_minutes,
         int const
@@ -149,9 +175,12 @@ void
 
 void
     single_month_range(
-        time_t i_now,
-        time_t * const pi_begin,
-        time_t * const pi_end);
+        time_t
+            i_now,
+        time_t * const
+            pi_begin,
+        time_t * const
+            pi_end);
 
 void
 format_date(
