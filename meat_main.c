@@ -22,6 +22,8 @@ Description:
 
 #include "meat_game.h"
 
+#include "meat_file.h"
+
 /*
 
 Interface:
@@ -57,16 +59,61 @@ Interface:
 
 static
 void
+print_string(
+    struct meat_file * const
+        p_file,
+    char const * const
+        a_msg)
+{
+    char const *
+        p_msg;
+
+    p_msg =
+        a_msg;
+
+    while (
+        *(
+            p_msg))
+    {
+        meat_file_write_char(
+            p_file,
+            *(
+                p_msg));
+
+        p_msg ++;
+    }
+}
+
+struct meat_game_report_context
+{
+    struct meat_opts *
+        p_opts;
+
+    struct meat_file *
+        p_file_out;
+
+}; /* struct meat_game_report_context */
+
+static
+void
     meat_game_report_callback(
         void * const
             p_context,
         struct meat_game * const
             p_game)
 {
+    struct meat_game_report_context *
+        p_report_context =
+        (struct meat_game_report_context *)(
+            p_context);
+
     struct meat_opts * const
         p_opts =
-        (struct meat_opts *)(
-            p_context);
+        p_report_context->p_opts;
+
+    struct meat_file * const
+        p_file_out =
+        p_report_context->p_file_out;
 
     if (
         (
@@ -76,15 +123,44 @@ void
             p_game->i_game_time
             <= p_opts->i_end))
     {
-        char ac_game_time[64u];
+        char
+            ac_game_time[64u];
 
         format_date(
             p_game->i_game_time,
             ac_game_time);
 
-        printf("%-26s  %s\n",
-            ac_game_time,
+        print_string(
+            p_file_out,
+            ac_game_time);
+
+        {
+            int
+                i_date_len;
+
+            i_date_len =
+                strlen(
+                    ac_game_time);
+
+            while (
+                i_date_len
+                < 28)
+            {
+                meat_file_write_char(
+                    p_file_out,
+                    ' ');
+
+                i_date_len ++;
+            }
+        }
+
+        print_string(
+            p_file_out,
             p_game->a_remarks);
+
+        meat_file_write_char(
+            p_file_out,
+            '\n');
     }
 
 } /* meat_game_report_callback() */
@@ -99,7 +175,16 @@ int
     struct meat_opts
         o_opts;
 
+    struct meat_file
+        o_file_out;
+
     meat_heap_init();
+
+    meat_file_init(
+        &(
+            o_file_out),
+        meat_file_type_stdout,
+        NULL);
 
     meat_opts_init(
         &(
@@ -111,18 +196,23 @@ int
         o_opts.i_end
         > o_opts.i_begin)
     {
-        FILE *
-            p_input;
+        char
+            b_input;
+
+        struct meat_file
+            o_file_in;
 
         o_opts.i_end -= 10;
 
-        p_input =
-            fopen(
-                "games.txt",
-                "r");
+        b_input =
+            meat_file_init(
+                &(
+                    o_file_in),
+                meat_file_type_stdin,
+                NULL);
 
         if (
-            p_input)
+            b_input)
         {
             struct meat_game_list
                 o_game_list;
@@ -131,16 +221,16 @@ int
                 meat_game_list_init(
                     &(
                         o_game_list),
-                    p_input))
+                    &(
+                        o_file_in)))
             {
-                fclose(
-                    p_input);
+                meat_file_cleanup(
+                    &(
+                        o_file_in));
 
-                p_input =
-                    NULL;
+                b_input =
+                    0;
 
-                if (
-                    1)
                 {
                     /* Print the selected range */
                     char
@@ -157,16 +247,52 @@ int
                         o_opts.i_end,
                         ac_range_end);
 
-                    printf("Range from %s to %s\n", ac_range_begin, ac_range_end);
+                    print_string(
+                        &(
+                            o_file_out),
+                        "Range from ");
+
+                    print_string(
+                        &(
+                            o_file_out),
+                        ac_range_begin);
+
+                    print_string(
+                        &(
+                            o_file_out),
+                        " to ");
+
+                    print_string(
+                        &(
+                            o_file_out),
+                        ac_range_end);
+
+                    print_string(
+                        &(
+                            o_file_out),
+                        "\n");
                 }
 
-                meat_game_list_iterate(
-                    &(
-                        o_game_list),
-                    &(
-                        meat_game_report_callback),
-                    &(
-                        o_opts));
+                {
+                    struct meat_game_report_context
+                        o_report_context;
+
+                    o_report_context.p_opts =
+                        &(
+                            o_opts);
+
+                    o_report_context.p_file_out =
+                        &(
+                            o_file_out);
+
+                    meat_game_list_iterate(
+                        &(
+                            o_game_list),
+                        &(
+                            meat_game_report_callback),
+                        &(
+                            o_report_context));
+                }
 
                 meat_game_list_cleanup(
                     &(
@@ -174,20 +300,28 @@ int
             }
 
             if (
-                p_input)
+                b_input)
             {
-                fclose(
-                    p_input);
+                meat_file_cleanup(
+                    &(
+                        o_file_in));
 
-                p_input =
-                    NULL;
+                b_input =
+                    0;
             }
         }
     }
     else
     {
-        printf("wha?\n");
+        print_string(
+            &(
+                o_file_out),
+            "wha?\n");
     }
+
+    meat_file_cleanup(
+        &(
+            o_file_out));
 
     meat_opts_cleanup(
         &(

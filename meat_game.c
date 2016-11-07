@@ -20,6 +20,8 @@ Description:
 
 #include "meat_time.h"
 
+#include "meat_file.h"
+
 static
 char *
 strip_trailing_spaces(
@@ -176,15 +178,95 @@ char
 
 static
 char
+    read_line(
+        struct meat_file * const
+            p_file,
+        char * const
+            p_buf,
+        size_t const
+            i_buf_len)
+{
+    char
+        b_result;
+
+    char
+        b_end_of_file;
+
+    char
+        b_end_of_line;
+
+    size_t
+        i_index;
+
+    i_index =
+        0;
+
+    b_end_of_line =
+        0;
+
+    b_end_of_file =
+        0;
+
+    while (
+        !b_end_of_file
+        && !b_end_of_line
+        && (
+            i_index < (i_buf_len - 1)))
+    {
+        int
+            i_char;
+
+        i_char =
+            meat_file_read_char(
+                p_file);
+
+        if (
+            i_char >= 0)
+        {
+            if (
+                '\n' == i_char)
+            {
+                b_end_of_line =
+                    1;
+            }
+            else
+            {
+                p_buf[i_index] =
+                    (char)(
+                        i_char);
+
+                i_index ++;
+            }
+        }
+        else
+        {
+            b_end_of_file =
+                1;
+        }
+    }
+
+    p_buf[i_index] =
+        '\000';
+
+    b_result =
+        (
+            (0 != i_index)
+            ? 1
+            : 0);
+
+    return
+        b_result;
+
+} /* read_line() */
+
+static
+char
     process_file(
         struct meat_game_list * const
             p_game_list,
-        FILE * const
-            p_input)
+        struct meat_file * const
+            p_file)
 {
-    char *
-        p_result;
-
     char
         b_continue;
 
@@ -197,29 +279,21 @@ char
     while (
         b_continue)
     {
-        p_result =
-            fgets(
+        b_continue =
+            read_line(
+                p_file,
                 a_line,
                 sizeof(
-                    a_line),
-                p_input);
+                    a_line));
 
         if (
-            p_result)
+            b_continue)
         {
-            a_line[255u] =
-                '\000';
-
             b_continue =
                 process_line(
                     p_game_list,
                     a_line);
 
-        }
-        else
-        {
-            b_continue =
-                0;
         }
     }
 
@@ -253,8 +327,8 @@ char
 meat_game_list_init(
     struct meat_game_list * const
         p_game_list,
-    FILE * const
-        p_input)
+    struct meat_file * const
+        p_file)
 {
     meat_list_init(
         &(
@@ -263,7 +337,7 @@ meat_game_list_init(
     return
         process_file(
             p_game_list,
-            p_input);
+            p_file);
 
 } /* meat_game_list_init() */
 

@@ -29,6 +29,9 @@ Description:
 /* Predefine */
 struct meat_game;
 
+/* Predefine */
+struct meat_file;
+
 /*
 
 Structure: meat_game
@@ -74,8 +77,8 @@ char
 meat_game_list_init(
     struct meat_game_list * const
         p_list,
-    FILE * const
-        p_input);
+    struct meat_file * const
+        p_file);
 
 #if defined(__cplusplus)
 extern "C"
