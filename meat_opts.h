@@ -22,10 +22,10 @@ Description:
 */
 struct meat_opts
 {
-    time_t
+    signed long int
         i_begin;
 
-    time_t
+    signed long int
         i_end;
 
 }; /* struct meat_opts */

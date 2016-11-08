@@ -24,6 +24,10 @@ char
 b_meat_heap_init_done = 0;
 
 static
+int
+i_meat_heap_count = 0;
+
+static
 struct meat_list
 o_meat_heap_list =
 {
@@ -161,14 +165,6 @@ meat_heap_alloc(
         if (
             p_prefix)
         {
-            p_body =
-                (char *)(
-                    p_prefix + 1);
-
-            p_suffix =
-                (struct meat_heap_suffix *)(
-                    p_body + p_prefix->i_buf_len);
-
             meat_list_init(
                 &(
                     p_prefix->o_list));
@@ -185,10 +181,18 @@ meat_heap_alloc(
                 MEAT_HEAP_HEADER_SIGNATURE,
                 sizeof(p_prefix->a_header));
 
+            p_body =
+                (char *)(
+                    p_prefix + 1);
+
             memset(
                 p_body,
                 MEAT_HEAP_BODY_CREATED,
                 p_prefix->i_buf_len);
+
+            p_suffix =
+                (struct meat_heap_suffix *)(
+                    p_body + p_prefix->i_buf_len);
 
             memset(
                 p_suffix->a_footer,
@@ -204,6 +208,8 @@ meat_heap_alloc(
             p_buf =
                 (void *)(
                     p_body);
+
+            i_meat_heap_count ++;
         }
         else
         {
@@ -304,6 +310,8 @@ meat_heap_free(
 
         free(
             p_prefix);
+
+        i_meat_heap_count --;
     }
     else
     {

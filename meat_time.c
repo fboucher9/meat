@@ -13,64 +13,66 @@ Description:
 #include "meat_time.h"
 
 signed long int
-    offset_minutes(
+    meat_time_offset_minutes(
         int const i_minutes)
 {
-    return ((signed long int)(i_minutes) * 60l);
+    return
+        i_minutes;
+
 }
 
 signed long int
-    offset_hours(
+    meat_time_offset_hours(
         int const i_hour)
 {
     return
-        offset_minutes(
+        meat_time_offset_minutes(
             i_hour * 60l);
 }
 
 signed long int
-    offset_time_of_day(
+    meat_time_offset_time_of_day(
         int const i_hour,
         int const i_minutes)
 {
     return
         (
-            offset_hours(
+            meat_time_offset_hours(
                 i_hour)
-            + offset_minutes(
+            + meat_time_offset_minutes(
                 i_minutes));
 }
 
 signed long int
-    offset_days(
+    meat_time_offset_days(
         int const i_days)
 {
     return
-        offset_hours(
+        meat_time_offset_hours(
             i_days * 24l);
 }
 
 signed long int
-    offset_weeks(
+    meat_time_offset_weeks(
         int const i_weeks)
 {
     return
-        offset_days(
+        meat_time_offset_days(
             i_weeks * 7);
 }
 
 signed long int
-    offset_months(
+    meat_time_offset_months(
         int const i_months)
 {
     return
-        offset_days(
+        meat_time_offset_days(
             i_months * 30);
 
 }
 
-time_t
-    init_day(
+signed long int
+    meat_time_init_day(
         int const
             i_minutes,
         int const
@@ -113,240 +115,263 @@ time_t
         0;
 
     return
-        mktime(
-            &o_descriptor);
+        (signed long int)(
+            mktime(
+                &o_descriptor) / 60l);
 
 }
 
 void
-    get_day(
-        time_t const
+    meat_time_get_day(
+        signed long int const
             base,
-        struct tm * const
-            po_result)
+        struct meat_time_info * const
+            p_result)
 {
     struct tm const *
-        po_localtime_tmp;
+        p_tmp;
 
-    po_localtime_tmp =
+    time_t
+        i_posix_time;
+
+    i_posix_time =
+        (time_t)(
+            base)
+        * 60l;
+
+    p_tmp =
         localtime(
             &(
-                base));
+                i_posix_time));
 
     if (
-        po_localtime_tmp)
+        p_tmp)
     {
-        *(
-            po_result) =
-            *(
-                po_localtime_tmp);
+        p_result->i_minute =
+            p_tmp->tm_min;
+
+        p_result->i_hour =
+            p_tmp->tm_hour;
+
+        p_result->i_day_of_month =
+            p_tmp->tm_mday;
+
+        p_result->i_day_of_week =
+            p_tmp->tm_wday;
+
+        p_result->i_month =
+            p_tmp->tm_mon;
+
+        p_result->i_year =
+            p_tmp->tm_year;
     }
 
 }
 
-time_t
-    find_begin_of_day(
-        time_t const
+signed long int
+    meat_time_find_begin_of_day(
+        signed long int const
             i_now)
 {
-    struct tm
+    struct meat_time_info
         o_now;
 
-    get_day(
+    meat_time_get_day(
         i_now,
         &(
             o_now));
 
     return
         i_now
-        - offset_time_of_day(
-            o_now.tm_hour,
-            o_now.tm_min);
+        - meat_time_offset_time_of_day(
+            o_now.i_hour,
+            o_now.i_minute);
 
 }
 
-time_t
-    find_end_of_day(
-        time_t const
+signed long int
+    meat_time_find_end_of_day(
+        signed long int const
             i_now)
 {
     return
-        find_begin_of_day(
+        meat_time_find_begin_of_day(
             i_now)
-        + offset_days(1);
+        + meat_time_offset_days(1);
 }
 
-time_t
-    find_begin_of_week(
-        time_t const
+signed long int
+    meat_time_find_begin_of_week(
+        signed long int const
             i_now)
 {
-    struct tm
+    struct meat_time_info
         o_now;
 
-    get_day(
+    meat_time_get_day(
         i_now,
         &(
             o_now));
 
     return
-        find_begin_of_day(
+        meat_time_find_begin_of_day(
             i_now)
-        - offset_days(
-            o_now.tm_wday);
+        - meat_time_offset_days(
+            o_now.i_day_of_week);
+
 }
 
-time_t
-    find_end_of_week(
-        time_t const
+signed long int
+    meat_time_find_end_of_week(
+        signed long int const
             i_now)
 {
     return
-        find_begin_of_week(
+        meat_time_find_begin_of_week(
             i_now)
-        + offset_weeks(1);
+        + meat_time_offset_weeks(1);
 
 }
 
-time_t
-    find_begin_of_month(
-        time_t const i_now)
+signed long int
+    meat_time_find_begin_of_month(
+        signed long int const i_now)
 {
-    struct tm
+    struct meat_time_info
         o_now;
 
-    get_day(
+    meat_time_get_day(
         i_now,
         &(
             o_now));
 
     return
         i_now
-        - offset_time_of_day(
-            o_now.tm_hour,
-            o_now.tm_min)
-        - offset_days(
-            o_now.tm_mday - 1);
+        - meat_time_offset_time_of_day(
+            o_now.i_hour,
+            o_now.i_minute)
+        - meat_time_offset_days(
+            o_now.i_day_of_month - 1);
 
 }
 
-time_t
-    find_middle_of_month(
-        time_t const
+signed long int
+    meat_time_find_middle_of_month(
+        signed long int const
             i_now,
         int const
             i_count)
 {
-    time_t
+    signed long int
         i_begin_of_month;
 
     i_begin_of_month =
-        find_begin_of_month(
+        meat_time_find_begin_of_month(
             i_now);
 
     /* Offset to get to middle of month */
     return
         (
             i_begin_of_month
-            + offset_days(
+            + meat_time_offset_days(
                 14)
-            + offset_months(
+            + meat_time_offset_months(
                 i_count));
 
 }
 
-time_t
-    find_end_of_month(
-        time_t const
+signed long int
+    meat_time_find_end_of_month(
+        signed long int const
             i_now)
 {
-    time_t
+    signed long int
         i_middle_of_next_month;
 
     i_middle_of_next_month =
-        find_middle_of_month(
+        meat_time_find_middle_of_month(
             i_now,
             1);
 
     return
-        find_begin_of_month(
+        meat_time_find_begin_of_month(
             i_middle_of_next_month);
 
 }
 
 void
-    align_range_to_day(
-        time_t const
+    meat_time_align_range_to_day(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end)
 {
     *pi_begin =
-        find_begin_of_day(
+        meat_time_find_begin_of_day(
             i_begin);
 
     *pi_end =
-        find_end_of_day(
+        meat_time_find_end_of_day(
             i_end);
 
 }
 
 void
-    align_range_to_week(
-        time_t const
+    meat_time_align_range_to_week(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end)
 {
     *pi_begin =
-        find_begin_of_week(
+        meat_time_find_begin_of_week(
             i_begin);
 
     *pi_end =
-        find_end_of_week(
+        meat_time_find_end_of_week(
             i_end);
 
 }
 
 void
-    align_range_to_month(
-        time_t const
+    meat_time_align_range_to_month(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end)
 {
     *pi_begin =
-        find_begin_of_month(
+        meat_time_find_begin_of_month(
             i_begin);
 
     *pi_end =
-        find_end_of_month(
+        meat_time_find_end_of_month(
             i_end);
 
 }
 
 void
-    single_day_range(
-        time_t const
+    meat_time_single_day_range(
+        signed long int const
             i_now,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end)
 {
-    align_range_to_day(
+    meat_time_align_range_to_day(
         i_now,
         i_now,
         pi_begin,
@@ -354,15 +379,15 @@ void
 }
 
 void
-    single_week_range(
-        time_t const
+    meat_time_single_week_range(
+        signed long int const
             i_now,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end)
 {
-    align_range_to_week(
+    meat_time_align_range_to_week(
         i_now,
         i_now,
         pi_begin,
@@ -370,12 +395,12 @@ void
 }
 
 void
-    single_month_range(
-        time_t i_now,
-        time_t * const pi_begin,
-        time_t * const pi_end)
+    meat_time_single_month_range(
+        signed long int i_now,
+        signed long int * const pi_begin,
+        signed long int * const pi_end)
 {
-    align_range_to_month(
+    meat_time_align_range_to_month(
         i_now,
         i_now,
         pi_begin,
@@ -384,8 +409,8 @@ void
 }
 
 void
-format_date(
-    time_t const
+meat_time_format_date(
+    signed long int const
         i_now,
     char * const
         p_text)
@@ -393,10 +418,18 @@ format_date(
     char const *
         p_buf;
 
+    time_t
+        i_posix_time;
+
+    i_posix_time =
+        (time_t)(
+            i_now)
+        * 60l;
+
     p_buf =
         ctime(
             &(
-                i_now));
+                i_posix_time));
 
     if (
         p_buf)
@@ -431,7 +464,7 @@ format_date(
 }
 
 int
-which_month(
+meat_time_which_month(
     char const * const
         p_arg)
 {
@@ -489,7 +522,7 @@ which_month(
 }
 
 int
-which_wday(
+meat_time_which_wday(
     char const * const
         p_arg)
 {

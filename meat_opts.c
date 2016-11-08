@@ -47,16 +47,16 @@ void
         char const * const * const
             p_argv)
 {
-    time_t
+    signed long int
         i_now;
 
-    struct tm
+    struct meat_time_info
         o_time_now;
 
-    time_t
+    signed long int
         i_range_begin;
 
-    time_t
+    signed long int
         i_range_end;
 
     int
@@ -69,10 +69,11 @@ void
         i_wday;
 
     i_now =
-        time(
-            NULL);
+        (signed long int)(
+            time(
+                NULL) / 60l);
 
-    get_day(
+    meat_time_get_day(
         i_now,
         &(
             o_time_now));
@@ -104,22 +105,22 @@ void
         /* next|last|this October... */
         if (0 == strcmp(p_argv[1], "today"))
         {
-            single_day_range(
+            meat_time_single_day_range(
                 i_now,
                 &i_range_begin,
                 &i_range_end);
         }
         else if (0 == strcmp(p_argv[1], "tomorrow"))
         {
-            single_day_range(
-                i_now + offset_days(1),
+            meat_time_single_day_range(
+                i_now + meat_time_offset_days(1),
                 &i_range_begin,
                 &i_range_end);
         }
         else if (0 == strcmp(p_argv[1], "yesterday"))
         {
-            single_day_range(
-                i_now - offset_days(1),
+            meat_time_single_day_range(
+                i_now - meat_time_offset_days(1),
                 &i_range_begin,
                 &i_range_end);
         }
@@ -129,21 +130,21 @@ void
             {
                 if (0 == strcmp(p_argv[2], "day"))
                 {
-                    single_day_range(
+                    meat_time_single_day_range(
                         i_now,
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "week"))
                 {
-                    single_week_range(
+                    meat_time_single_week_range(
                         i_now,
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "month"))
                 {
-                    single_month_range(
+                    meat_time_single_month_range(
                         i_now,
                         &i_range_begin,
                         &i_range_end);
@@ -156,22 +157,22 @@ void
             {
                 if (0 == strcmp(p_argv[2], "day"))
                 {
-                    single_day_range(
-                        i_now + offset_days(1),
+                    meat_time_single_day_range(
+                        i_now + meat_time_offset_days(1),
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "week"))
                 {
-                    single_week_range(
-                        i_now + offset_weeks(1),
+                    meat_time_single_week_range(
+                        i_now + meat_time_offset_weeks(1),
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "month"))
                 {
-                    single_month_range(
-                        find_middle_of_month(i_now, 1),
+                    meat_time_single_month_range(
+                        meat_time_find_middle_of_month(i_now, 1),
                         &i_range_begin,
                         &i_range_end);
                 }
@@ -183,47 +184,47 @@ void
                     {
                         if ((i_count > 1) && (0 == strcmp(p_argv[3], "days")))
                         {
-                            align_range_to_day(
-                                i_now + offset_days(1),
-                                i_now + offset_days(i_count),
+                            meat_time_align_range_to_day(
+                                i_now + meat_time_offset_days(1),
+                                i_now + meat_time_offset_days(i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
                         else if ((i_count > 1) && (0 == strcmp(p_argv[3], "weeks")))
                         {
-                            align_range_to_week(
-                                i_now + offset_weeks(1),
-                                i_now + offset_weeks(i_count),
+                            meat_time_align_range_to_week(
+                                i_now + meat_time_offset_weeks(1),
+                                i_now + meat_time_offset_weeks(i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
                         else if ((i_count > 1) && (0 == strcmp(p_argv[3], "months")))
                         {
-                            align_range_to_month(
-                                find_middle_of_month(i_now, 1),
-                                find_middle_of_month(i_now, i_count),
+                            meat_time_align_range_to_month(
+                                meat_time_find_middle_of_month(i_now, 1),
+                                meat_time_find_middle_of_month(i_now, i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
                     }
                 }
-                else if (-1 != (i_wday = which_wday(p_argv[2])))
+                else if (-1 != (i_wday = meat_time_which_wday(p_argv[2])))
                 {
-                    if (i_wday > o_time_now.tm_wday)
+                    if (i_wday > o_time_now.i_day_of_week)
                     {
-                        single_day_range(
+                        meat_time_single_day_range(
                             i_now
-                            + offset_days(
-                                i_wday - o_time_now.tm_wday),
+                            + meat_time_offset_days(
+                                i_wday - o_time_now.i_day_of_week),
                             &i_range_begin,
                             &i_range_end);
                     }
                     else
                     {
-                        single_day_range(
+                        meat_time_single_day_range(
                             i_now
-                            + offset_days(
-                                7 + i_wday - o_time_now.tm_wday),
+                            + meat_time_offset_days(
+                                7 + i_wday - o_time_now.i_day_of_week),
                             &i_range_begin,
                             &i_range_end);
                     }
@@ -236,22 +237,22 @@ void
             {
                 if (0 == strcmp(p_argv[2], "day"))
                 {
-                    single_day_range(
-                        i_now - offset_days(1),
+                    meat_time_single_day_range(
+                        i_now - meat_time_offset_days(1),
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "week"))
                 {
-                    single_week_range(
-                        i_now - offset_weeks(1),
+                    meat_time_single_week_range(
+                        i_now - meat_time_offset_weeks(1),
                         &i_range_begin,
                         &i_range_end);
                 }
                 else if (0 == strcmp(p_argv[2], "month"))
                 {
-                    single_month_range(
-                        find_middle_of_month(i_now, -1),
+                    meat_time_single_month_range(
+                        meat_time_find_middle_of_month(i_now, -1),
                         &i_range_begin,
                         &i_range_end);
                 }
@@ -265,25 +266,25 @@ void
                         {
                             if (0 == strcmp(p_argv[3], "days"))
                             {
-                                align_range_to_day(
-                                    i_now - offset_days(i_count),
-                                    i_now - offset_days(1),
+                                meat_time_align_range_to_day(
+                                    i_now - meat_time_offset_days(i_count),
+                                    i_now - meat_time_offset_days(1),
                                     &i_range_begin,
                                     &i_range_end);
                             }
                             else if (0 == strcmp(p_argv[3], "weeks"))
                             {
-                                align_range_to_week(
-                                    i_now - offset_weeks(i_count),
-                                    i_now - offset_weeks(1),
+                                meat_time_align_range_to_week(
+                                    i_now - meat_time_offset_weeks(i_count),
+                                    i_now - meat_time_offset_weeks(1),
                                     &i_range_begin,
                                     &i_range_end);
                             }
                             else if (0 == strcmp(p_argv[3], "months"))
                             {
-                                align_range_to_month(
-                                    find_middle_of_month(i_now, -i_count),
-                                    find_middle_of_month(i_now, -1),
+                                meat_time_align_range_to_month(
+                                    meat_time_find_middle_of_month(i_now, -i_count),
+                                    meat_time_find_middle_of_month(i_now, -1),
                                     &i_range_begin,
                                     &i_range_end);
                             }
@@ -309,8 +310,8 @@ void
                             (i_count == 1)
                             && (0 == strcmp(p_argv[2], "day"))))
                     {
-                        single_day_range(
-                            i_now - offset_days(i_count),
+                        meat_time_single_day_range(
+                            i_now - meat_time_offset_days(i_count),
                             &i_range_begin,
                             &i_range_end);
                     }
@@ -322,8 +323,8 @@ void
                             (i_count == 1)
                             && (0 == strcmp(p_argv[2], "week"))))
                     {
-                        single_week_range(
-                            i_now - offset_weeks(i_count),
+                        meat_time_single_week_range(
+                            i_now - meat_time_offset_weeks(i_count),
                             &i_range_begin,
                             &i_range_end);
                     }
@@ -335,8 +336,8 @@ void
                             (i_count == 1)
                             && (0 == strcmp(p_argv[2], "month"))))
                     {
-                        single_month_range(
-                            find_middle_of_month(i_now, -i_count),
+                        meat_time_single_month_range(
+                            meat_time_find_middle_of_month(i_now, -i_count),
                             &i_range_begin,
                             &i_range_end);
                     }
@@ -361,8 +362,8 @@ void
                                 (i_count == 1)
                                 && (0 == strcmp(p_argv[3], "day"))))
                         {
-                            single_day_range(
-                                i_now + offset_days(i_count),
+                            meat_time_single_day_range(
+                                i_now + meat_time_offset_days(i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
@@ -374,8 +375,8 @@ void
                                 (i_count == 1)
                                 && (0 == strcmp(p_argv[3], "week"))))
                         {
-                            single_week_range(
-                                i_now + offset_weeks(i_count),
+                            meat_time_single_week_range(
+                                i_now + meat_time_offset_weeks(i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
@@ -387,8 +388,8 @@ void
                                 (i_count == 1)
                                 && (0 == strcmp(p_argv[3], "month"))))
                         {
-                            single_month_range(
-                                find_middle_of_month(i_now, i_count),
+                            meat_time_single_month_range(
+                                meat_time_find_middle_of_month(i_now, i_count),
                                 &i_range_begin,
                                 &i_range_end);
                         }
@@ -396,50 +397,50 @@ void
                 }
             }
         }
-        else if (-1 != (i_month = which_month(p_argv[1])))
+        else if (-1 != (i_month = meat_time_which_month(p_argv[1])))
         {
-            time_t
+            signed long int
                 i_random_day_of_month;
 
-            if (o_time_now.tm_mon > i_month)
+            if (o_time_now.i_month > i_month)
             {
                 i_random_day_of_month =
-                    init_day(
+                    meat_time_init_day(
                         0,
                         12,
                         11,
                         i_month,
-                        o_time_now.tm_year + 1);
+                        o_time_now.i_year + 1);
             }
             else
             {
                 i_random_day_of_month =
-                    init_day(
+                    meat_time_init_day(
                         0,
                         12,
                         11,
                         i_month,
-                        o_time_now.tm_year);
+                        o_time_now.i_year);
             }
 
-            single_month_range(
+            meat_time_single_month_range(
                 i_random_day_of_month,
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (-1 != (i_wday = which_wday(p_argv[1])))
+        else if (-1 != (i_wday = meat_time_which_wday(p_argv[1])))
         {
-            single_day_range(
+            meat_time_single_day_range(
                 i_now
-                + offset_days(
-                    i_wday - o_time_now.tm_wday),
+                + meat_time_offset_days(
+                    i_wday - o_time_now.i_day_of_week),
                 &i_range_begin,
                 &i_range_end);
         }
     }
     else
     {
-        align_range_to_week(
+        meat_time_align_range_to_week(
             i_now,
             i_now,
             &i_range_begin,

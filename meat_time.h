@@ -17,7 +17,6 @@ Description:
 #error include meat_time.h once
 #endif /* #if defined(INC_MEAT_TIME_H) */
 
-#if 0
 struct meat_time_info
 {
     int
@@ -39,35 +38,55 @@ struct meat_time_info
         i_year;
 
 }; /* struct meat_time_info */
-#endif
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_hours(
+    meat_time_offset_hours(
         int const i_hour);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_minutes(
+    meat_time_offset_minutes(
         int const i_minutes);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_time_of_day(
+    meat_time_offset_time_of_day(
         int const i_hour,
         int const i_minutes);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_days(
+    meat_time_offset_days(
         int const i_days);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_weeks(
+    meat_time_offset_weeks(
         int const i_weeks);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 signed long int
-    offset_months(
+    meat_time_offset_months(
         int const i_months);
 
-time_t
-    init_day(
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_init_day(
         int const
             i_minutes,
         int const
@@ -79,123 +98,174 @@ time_t
         int const
             year);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    get_day(
-        time_t const
+    meat_time_get_day(
+        signed long int const
             base,
-        struct tm * const
-            po_result);
+        struct meat_time_info * const
+            p_result);
 
-time_t
-    find_begin_of_day(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_begin_of_day(
+        signed long int const
             i_now);
 
-time_t
-    find_end_of_day(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_end_of_day(
+        signed long int const
             i_now);
 
-time_t
-    find_begin_of_week(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_begin_of_week(
+        signed long int const
             i_now);
 
-time_t
-    find_end_of_week(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_end_of_week(
+        signed long int const
             i_now);
 
-time_t
-    find_begin_of_month(
-        time_t const i_now);
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_begin_of_month(
+        signed long int const i_now);
 
-time_t
-    find_middle_of_month(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_middle_of_month(
+        signed long int const
             i_now,
         int const
             i_count);
 
-time_t
-    find_end_of_month(
-        time_t const
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+    meat_time_find_end_of_month(
+        signed long int const
             i_now);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    align_range_to_day(
-        time_t const
+    meat_time_align_range_to_day(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    align_range_to_week(
-        time_t const
+    meat_time_align_range_to_week(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    align_range_to_month(
-        time_t const
+    meat_time_align_range_to_month(
+        signed long int const
             i_begin,
-        time_t const
+        signed long int const
             i_end,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    single_day_range(
-        time_t const
+    meat_time_single_day_range(
+        signed long int const
             i_now,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    single_week_range(
-        time_t const
+    meat_time_single_week_range(
+        signed long int const
             i_now,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-    single_month_range(
-        time_t
+    meat_time_single_month_range(
+        signed long int
             i_now,
-        time_t * const
+        signed long int * const
             pi_begin,
-        time_t * const
+        signed long int * const
             pi_end);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 void
-format_date(
-    time_t const
+meat_time_format_date(
+    signed long int const
         i_now,
     char * const
         p_text);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 int
-which_month(
+meat_time_which_month(
     char const * const
         p_arg);
 
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
 int
-which_wday(
+meat_time_which_wday(
     char const * const
         p_arg);
 

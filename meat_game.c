@@ -139,7 +139,7 @@ char
                     i_offset));
 
             p_game->i_game_time =
-                init_day(
+                meat_time_init_day(
                     minute,
                     hour,
                     day,

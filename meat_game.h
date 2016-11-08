@@ -46,7 +46,7 @@ struct meat_game
     struct meat_list
         o_list;
 
-    time_t
+    signed long int
         i_game_time;
 
     char

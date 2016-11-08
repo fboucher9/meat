@@ -128,7 +128,7 @@ void
         char
             ac_game_time[64u];
 
-        format_date(
+        meat_time_format_date(
             p_game->i_game_time,
             ac_game_time);
 
@@ -244,11 +244,11 @@ int
                     char
                         ac_range_end[64u];
 
-                    format_date(
+                    meat_time_format_date(
                         o_opts.i_begin,
                         ac_range_begin);
 
-                    format_date(
+                    meat_time_format_date(
                         o_opts.i_end,
                         ac_range_end);
 
