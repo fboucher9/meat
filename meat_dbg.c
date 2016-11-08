@@ -12,6 +12,9 @@ Description:
 
 #include "meat_dbg.h"
 
+/* For raise() */
+#include <signal.h>
+
 /*
 
 Function: meat_dbg_break

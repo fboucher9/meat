@@ -128,22 +128,20 @@ void
         char
             ac_game_time[64u];
 
-        meat_time_format_date(
-            p_game->i_game_time,
-            ac_game_time);
+        unsigned int
+            i_date_len;
+
+        i_date_len =
+            meat_time_format_date(
+                p_game->i_game_time,
+                ac_game_time,
+                sizeof(ac_game_time));
 
         print_string(
             p_file_out,
             ac_game_time);
 
         {
-            int
-                i_date_len;
-
-            i_date_len =
-                strlen(
-                    ac_game_time);
-
             while (
                 i_date_len
                 < 28)
@@ -246,11 +244,13 @@ int
 
                     meat_time_format_date(
                         o_opts.i_begin,
-                        ac_range_begin);
+                        ac_range_begin,
+                        sizeof(ac_range_begin));
 
                     meat_time_format_date(
                         o_opts.i_end,
-                        ac_range_end);
+                        ac_range_end,
+                        sizeof(ac_range_end));
 
                     print_string(
                         &(

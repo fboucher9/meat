@@ -23,68 +23,23 @@ Description:
 #include "meat_file.h"
 
 static
-char *
-strip_trailing_spaces(
-    char * const
-        p_buf)
-{
-    int
-        i_buf_len;
-
-    i_buf_len =
-        strlen(
-            p_buf);
-
-    while (
-        (
-            i_buf_len > 0)
-        && (
-            (
-                ' ' == p_buf[i_buf_len - 1])
-            || (
-                '\n' == p_buf[i_buf_len - 1])))
-    {
-        p_buf[i_buf_len - 1] = '\000';
-
-        i_buf_len --;
-    }
-
-    return p_buf;
-}
-
-static
-char const *
-skip_leading_spaces(
-    char const * const
-        p_buf)
-{
-    char const *
-        p_iterator;
-
-    p_iterator =
-        p_buf;
-
-    while (
-        ' ' == *p_iterator)
-    {
-        p_iterator ++;
-    }
-
-    return p_iterator;
-}
-
-static
 char
     process_line(
         struct meat_game_list * const
             p_game_list,
-        char * a_line)
+        char * const
+            a_line,
+        size_t const
+            i_line_len)
 {
     char
         b_continue;
 
     struct meat_game *
         p_game;
+
+    int
+        i_offset_end;
 
     p_game =
         (struct meat_game *)(
@@ -104,55 +59,83 @@ char
         p_game->a_remarks[0u] = '\000';
 
         {
-            unsigned int
-                year;
-
-            unsigned int
-                month;
-
-            unsigned int
-                day;
-
-            unsigned int
-                hour;
-
-            unsigned int
-                minute;
+            struct meat_time_info
+                o_game_time;
 
             int
                 i_offset;
 
+            size_t
+                i_remarks_iterator;
+
             sscanf(
                 a_line,
-                "%u%u%u%u%u%n",
+                "%d%d%d%d%d%n",
                 &(
-                    year),
+                    o_game_time.i_year),
                 &(
-                    month),
+                    o_game_time.i_month),
                 &(
-                    day),
+                    o_game_time.i_day_of_month),
                 &(
-                    hour),
+                    o_game_time.i_hour),
                 &(
-                    minute),
+                    o_game_time.i_minute),
                 &(
                     i_offset));
 
+            o_game_time.i_year -= 1900;
+
+            o_game_time.i_month --;
+
             p_game->i_game_time =
                 meat_time_init_day(
-                    minute,
-                    hour,
-                    day,
-                    month - 1,
-                    year - 1900);
+                    &(
+                        o_game_time));
 
-            strcpy(
-                p_game->a_remarks,
-                skip_leading_spaces(
-                    a_line + i_offset));
+            while (
+                (
+                    (size_t)(i_offset) < i_line_len)
+                && (
+                    ' ' == a_line[i_offset]))
+            {
+                i_offset ++;
+            }
 
-            strip_trailing_spaces(
-                p_game->a_remarks);
+            i_offset_end =
+                i_line_len;
+
+            while (
+                (
+                    i_offset_end > i_offset)
+                && (
+                    (
+                        ' ' == a_line[i_offset_end - 1])
+                    || (
+                        '\n' == a_line[i_offset_end - 1])))
+            {
+                i_offset_end --;
+            }
+
+            i_remarks_iterator =
+                0;
+
+            while (
+                i_offset < i_offset_end)
+            {
+                if (
+                    i_remarks_iterator < (sizeof(p_game->a_remarks) - 1))
+                {
+                    p_game->a_remarks[i_remarks_iterator] =
+                        a_line[i_offset];
+
+                    i_remarks_iterator ++;
+                }
+
+                i_offset ++;
+            }
+
+            p_game->a_remarks[i_remarks_iterator] = '\000';
         }
 
         meat_list_join(
@@ -176,7 +159,7 @@ char
 } /* process_line() */
 
 static
-char
+int
     read_line(
         struct meat_file * const
             p_file,
@@ -186,15 +169,12 @@ char
             i_buf_len)
 {
     char
-        b_result;
-
-    char
         b_end_of_file;
 
     char
         b_end_of_line;
 
-    size_t
+    int
         i_index;
 
     i_index =
@@ -208,9 +188,7 @@ char
 
     while (
         !b_end_of_file
-        && !b_end_of_line
-        && (
-            i_index < (i_buf_len - 1)))
+        && !b_end_of_line)
     {
         int
             i_char;
@@ -227,34 +205,38 @@ char
             {
                 b_end_of_line =
                     1;
+
+                p_buf[i_index] = '\000';
             }
             else
             {
-                p_buf[i_index] =
-                    (char)(
-                        i_char);
+                if (
+                    (size_t)(i_index) < (i_buf_len - 1))
+                {
+                    p_buf[i_index] =
+                        (char)(
+                            i_char);
 
-                i_index ++;
+                    i_index ++;
+                }
             }
         }
         else
         {
             b_end_of_file =
                 1;
+
+            p_buf[i_index] = '\000';
+
+            if (0 == i_index)
+            {
+                i_index = -1;
+            }
         }
     }
 
-    p_buf[i_index] =
-        '\000';
-
-    b_result =
-        (
-            (0 != i_index)
-            ? 1
-            : 0);
-
     return
-        b_result;
+        i_index;
 
 } /* read_line() */
 
@@ -278,7 +260,10 @@ char
     while (
         b_continue)
     {
-        b_continue =
+        int
+            i_line_len;
+
+        i_line_len =
             read_line(
                 p_file,
                 a_line,
@@ -286,13 +271,19 @@ char
                     a_line));
 
         if (
-            b_continue)
+            i_line_len >= 0)
         {
             b_continue =
                 process_line(
                     p_game_list,
-                    a_line);
+                    a_line,
+                    (size_t)(i_line_len));
 
+        }
+        else
+        {
+            b_continue =
+                0;
         }
     }
 

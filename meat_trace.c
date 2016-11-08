@@ -14,6 +14,9 @@ Description:
 
 #include "meat_trace.h"
 
+/* For backtrace() */
+#include <execinfo.h>
+
 static char b_meat_trace_init_done = 0;
 
 static char const * p_meat_trace_argv0 = NULL;

@@ -87,16 +87,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 signed long int
     meat_time_init_day(
-        int const
-            i_minutes,
-        int const
-            i_hour,
-        int const
-            mday,
-        int const
-            month,
-        int const
-            year);
+        struct meat_time_info const * const
+            p_info);
 
 #if defined(__cplusplus)
 extern "C"
@@ -246,12 +238,14 @@ void
 #if defined(__cplusplus)
 extern "C"
 #endif /* #if defined(__cplusplus) */
-void
+size_t
 meat_time_format_date(
     signed long int const
         i_now,
     char * const
-        p_text);
+        p_text,
+    size_t const
+        i_text_max_len);
 
 #if defined(__cplusplus)
 extern "C"
@@ -268,5 +262,11 @@ int
 meat_time_which_wday(
     char const * const
         p_arg);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed long int
+meat_time_now(void);
 
 /* end-of-file: meat_time.h */

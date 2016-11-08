@@ -69,9 +69,7 @@ void
         i_wday;
 
     i_now =
-        (signed long int)(
-            time(
-                NULL) / 60l);
+        meat_time_now();
 
     meat_time_get_day(
         i_now,
@@ -402,26 +400,36 @@ void
             signed long int
                 i_random_day_of_month;
 
+            struct meat_time_info
+                o_random_day_of_month;
+
+            o_random_day_of_month.i_minute =
+                0;
+
+            o_random_day_of_month.i_hour =
+                12;
+
+            o_random_day_of_month.i_day_of_month =
+                11;
+
+            o_random_day_of_month.i_month =
+                i_month;
+
             if (o_time_now.i_month > i_month)
             {
-                i_random_day_of_month =
-                    meat_time_init_day(
-                        0,
-                        12,
-                        11,
-                        i_month,
-                        o_time_now.i_year + 1);
+                o_random_day_of_month.i_year =
+                    o_time_now.i_year + 1;
             }
             else
             {
-                i_random_day_of_month =
-                    meat_time_init_day(
-                        0,
-                        12,
-                        11,
-                        i_month,
-                        o_time_now.i_year);
+                o_random_day_of_month.i_year =
+                    o_time_now.i_year;
             }
+
+            i_random_day_of_month =
+                meat_time_init_day(
+                    &(
+                        o_random_day_of_month));
 
             meat_time_single_month_range(
                 i_random_day_of_month,

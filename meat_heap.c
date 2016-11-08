@@ -18,6 +18,9 @@ Description:
 
 #include "meat_trace.h"
 
+/* For malloc and free, ... */
+#include <stdlib.h>
+
 /* State for meat_heap module */
 static
 char

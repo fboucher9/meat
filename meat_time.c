@@ -12,6 +12,9 @@ Description:
 
 #include "meat_time.h"
 
+/* For mktime, localtime, ctime, ... */
+#include <time.h>
+
 signed long int
     meat_time_offset_minutes(
         int const i_minutes)
@@ -73,16 +76,8 @@ signed long int
 
 signed long int
     meat_time_init_day(
-        int const
-            i_minutes,
-        int const
-            i_hour,
-        int const
-            mday,
-        int const
-            month,
-        int const
-            year)
+        struct meat_time_info const * const
+            p_info)
 {
     struct tm
         o_descriptor;
@@ -91,19 +86,19 @@ signed long int
         0;
 
     o_descriptor.tm_min =
-        i_minutes;
+        p_info->i_minute;
 
     o_descriptor.tm_hour =
-        i_hour;
+        p_info->i_hour;
 
     o_descriptor.tm_mday =
-        mday;
+        p_info->i_day_of_month;
 
     o_descriptor.tm_mon =
-        month;
+        p_info->i_month;
 
     o_descriptor.tm_year =
-        year;
+        p_info->i_year;
 
     o_descriptor.tm_wday =
         0;
@@ -408,13 +403,18 @@ void
 
 }
 
-void
+size_t
 meat_time_format_date(
     signed long int const
         i_now,
     char * const
-        p_text)
+        p_text,
+    size_t const
+        i_text_max_len)
 {
+    size_t
+        i_text_len;
+
     char const *
         p_buf;
 
@@ -434,33 +434,48 @@ meat_time_format_date(
     if (
         p_buf)
     {
-        int
-            i_buf_len;
-
-        i_buf_len =
-            strlen(
-                p_buf);
+        i_text_len =
+            (unsigned int)(
+                strlen(
+                    p_buf));
 
         if (
-            '\n'
-            == p_buf[i_buf_len - 1])
+            i_text_len > i_text_max_len)
         {
-            i_buf_len --;
+            i_text_len =
+                i_text_max_len
+                - 1;
+        }
+
+        if (
+            (
+                i_text_len
+                > 0)
+            && (
+                '\n'
+                == p_buf[i_text_len - 1]))
+        {
+            i_text_len --;
         }
 
         memcpy(
             p_text,
             p_buf,
-            i_buf_len);
+            i_text_len);
 
-        p_text[i_buf_len] =
+        p_text[i_text_len] =
             '\000';
     }
     else
     {
-        p_text[0] = '-';
-        p_text[1] = '\000';
+        p_text[0] = '\000';
+
+        i_text_len = 0;
     }
+
+    return
+        i_text_len;
+
 }
 
 int
@@ -582,3 +597,14 @@ meat_time_which_wday(
 
 }
 
+signed long int
+meat_time_now(void)
+{
+    return
+        (signed long int)(
+            time(
+                NULL) / 60l);
+
+}
+
+/* end-of-file: meat_time.c */
