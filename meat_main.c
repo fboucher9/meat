@@ -18,6 +18,8 @@ Description:
 
 #include "meat_heap.h"
 
+#include "meat_trace.h"
+
 #include "meat_opts.h"
 
 #include "meat_game.h"
@@ -178,6 +180,9 @@ int
     struct meat_file
         o_file_out;
 
+    meat_trace_init(
+        argv[0u]);
+
     meat_heap_init();
 
     meat_file_init(
@@ -328,6 +333,8 @@ int
             o_opts));
 
     meat_heap_cleanup();
+
+    meat_trace_cleanup();
 
     return 0;
 

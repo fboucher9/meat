@@ -16,6 +16,8 @@ Description:
 
 #include "meat_dbg.h"
 
+#include "meat_trace.h"
+
 /* State for meat_heap module */
 static
 char
@@ -30,6 +32,18 @@ o_meat_heap_list =
     &(
         o_meat_heap_list)
 };
+
+/* Value used to sign the header of each allocation */
+#define MEAT_HEAP_HEADER_SIGNATURE 0xBEu
+
+/* Value used to sign the footer of each allocation */
+#define MEAT_HEAP_FOOTER_SIGNATURE 0xAFu
+
+/* Value used to initialize body of allocation */
+#define MEAT_HEAP_BODY_CREATED 0xCCu
+
+/* Value used to uninitialize body of allocation */
+#define MEAT_HEAP_BODY_DESTROYED 0xCDu
 
 /*
 
@@ -51,7 +65,7 @@ struct meat_heap_prefix
     size_t
         i_buf_len;
 
-    char
+    unsigned char
         a_header[8u];
 
 }; /* struct meat_heap_prefix */
@@ -67,7 +81,7 @@ Description:
 */
 struct meat_heap_suffix
 {
-    char
+    unsigned char
         a_footer[8u];
 
 }; /* struct meat_heap_suffix */
@@ -159,7 +173,7 @@ meat_heap_alloc(
                 &(
                     p_prefix->o_list));
 
-            backtrace(
+            meat_trace_capture(
                 p_prefix->a_stack,
                 5u);
 
@@ -168,17 +182,17 @@ meat_heap_alloc(
 
             memset(
                 p_prefix->a_header,
-                0xBE,
+                MEAT_HEAP_HEADER_SIGNATURE,
                 sizeof(p_prefix->a_header));
 
             memset(
                 p_body,
-                0xCC,
+                MEAT_HEAP_BODY_CREATED,
                 p_prefix->i_buf_len);
 
             memset(
                 p_suffix->a_footer,
-                0xAF,
+                MEAT_HEAP_FOOTER_SIGNATURE,
                 sizeof(p_suffix->a_footer));
 
             meat_list_join(
@@ -253,6 +267,35 @@ meat_heap_free(
                 p_body
                 + p_prefix->i_buf_len);
 
+        {
+            unsigned int
+                i;
+
+            for (
+                i = 0;
+                i < 8u;
+                i ++)
+            {
+                if (
+                    (
+                        MEAT_HEAP_HEADER_SIGNATURE
+                        != p_prefix->a_header[i])
+                    || (
+                        MEAT_HEAP_FOOTER_SIGNATURE
+                        != p_suffix->a_footer[i]))
+                {
+                    meat_dbg_break();
+
+                    break;
+                }
+            }
+        }
+
+        memset(
+            p_body,
+            MEAT_HEAP_BODY_DESTROYED,
+            p_prefix->i_buf_len);
+
         meat_list_join(
             &(
                 p_prefix->o_list),
@@ -325,7 +368,9 @@ meat_heap_cleanup(void)
 
                 printf("*** allocation of %lu bytes ***\n", (unsigned long int)(p_prefix->i_buf_len));
 
-                backtrace_symbols_fd(p_prefix->a_stack, 5, 1);
+                meat_trace_report(
+                    p_prefix->a_stack,
+                    5);
 
                 p_iterator =
                     p_iterator->p_next;
