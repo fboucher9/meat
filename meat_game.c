@@ -22,15 +22,25 @@ Description:
 
 #include "meat_file.h"
 
+#include "meat_chunk.h"
+
+struct line_info
+{
+    unsigned char *
+        p_buf;
+
+    size_t
+        i_buf_len;
+
+};
+
 static
 char
     process_line(
         struct meat_game_list * const
             p_game_list,
-        char * const
-            a_line,
-        size_t const
-            i_line_len)
+        struct line_info * const
+            p_line_info)
 {
     char
         b_continue;
@@ -69,7 +79,8 @@ char
                 i_remarks_iterator;
 
             sscanf(
-                a_line,
+                (char const *)(
+                    p_line_info->p_buf),
                 "%d%d%d%d%d%n",
                 &(
                     o_game_time.i_year),
@@ -95,24 +106,24 @@ char
 
             while (
                 (
-                    (size_t)(i_offset) < i_line_len)
+                    (size_t)(i_offset) < p_line_info->i_buf_len)
                 && (
-                    ' ' == a_line[i_offset]))
+                    ' ' == p_line_info->p_buf[i_offset]))
             {
                 i_offset ++;
             }
 
             i_offset_end =
-                i_line_len;
+                p_line_info->i_buf_len;
 
             while (
                 (
                     i_offset_end > i_offset)
                 && (
                     (
-                        ' ' == a_line[i_offset_end - 1])
+                        ' ' == p_line_info->p_buf[i_offset_end - 1])
                     || (
-                        '\n' == a_line[i_offset_end - 1])))
+                        '\n' == p_line_info->p_buf[i_offset_end - 1])))
             {
                 i_offset_end --;
             }
@@ -127,7 +138,7 @@ char
                     i_remarks_iterator < (sizeof(p_game->a_remarks) - 1))
                 {
                     p_game->a_remarks[i_remarks_iterator] =
-                        a_line[i_offset];
+                        p_line_info->p_buf[i_offset];
 
                     i_remarks_iterator ++;
                 }
@@ -159,26 +170,31 @@ char
 } /* process_line() */
 
 static
-int
+char
     read_line(
         struct meat_file * const
             p_file,
-        char * const
-            p_buf,
-        size_t const
-            i_buf_len)
+        struct line_info * const
+            p_line_info)
 {
+    char
+        b_result;
+
     char
         b_end_of_file;
 
     char
         b_end_of_line;
 
-    int
-        i_index;
+    struct meat_chunk_list
+        o_chunk_list;
 
-    i_index =
-        0;
+    b_result =
+        1;
+
+    meat_chunk_list_init(
+        &(
+            o_chunk_list));
 
     b_end_of_line =
         0;
@@ -205,20 +221,14 @@ int
             {
                 b_end_of_line =
                     1;
-
-                p_buf[i_index] = '\000';
             }
             else
             {
-                if (
-                    (size_t)(i_index) < (i_buf_len - 1))
-                {
-                    p_buf[i_index] =
-                        (char)(
-                            i_char);
-
-                    i_index ++;
-                }
+                meat_chunk_list_write(
+                    &(
+                        o_chunk_list),
+                    (unsigned char)(
+                        i_char));
             }
         }
         else
@@ -226,17 +236,44 @@ int
             b_end_of_file =
                 1;
 
-            p_buf[i_index] = '\000';
-
-            if (0 == i_index)
+            if (0 == o_chunk_list.i_total_len)
             {
-                i_index = -1;
+                b_result = 0;
             }
         }
     }
 
+    /* copy line to output buffer */
+    if (
+        b_result)
+    {
+        p_line_info->p_buf =
+            meat_heap_alloc(
+                o_chunk_list.i_total_len + 1);
+
+        if (
+            p_line_info->p_buf)
+        {
+            meat_chunk_list_read(
+                &(
+                    o_chunk_list),
+                p_line_info->p_buf,
+                o_chunk_list.i_total_len);
+
+            p_line_info->p_buf[o_chunk_list.i_total_len] =
+                '\000';
+
+            p_line_info->i_buf_len =
+                o_chunk_list.i_total_len;
+        }
+    }
+
+    meat_chunk_list_cleanup(
+        &(
+            o_chunk_list));
+
     return
-        i_index;
+        b_result;
 
 } /* read_line() */
 
@@ -251,34 +288,39 @@ char
     char
         b_continue;
 
-    char
-        a_line[256u];
-
     b_continue =
         1;
 
     while (
         b_continue)
     {
-        int
-            i_line_len;
+        struct line_info
+            o_line_info;
 
-        i_line_len =
+        b_continue =
             read_line(
                 p_file,
-                a_line,
-                sizeof(
-                    a_line));
+                &(
+                    o_line_info));
 
         if (
-            i_line_len >= 0)
+            b_continue)
         {
             b_continue =
                 process_line(
                     p_game_list,
-                    a_line,
-                    (size_t)(i_line_len));
+                    &(
+                        o_line_info));
 
+            if (
+                o_line_info.p_buf)
+            {
+                meat_heap_free(
+                    o_line_info.p_buf);
+
+                o_line_info.p_buf =
+                    NULL;
+            }
         }
         else
         {

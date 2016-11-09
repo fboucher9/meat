@@ -204,6 +204,9 @@ meat_chunk_list_read(
     i_buf_it =
         0u;
 
+    p_list_it =
+        p_chunk_list->o_list.p_next;
+
     while (
         (
             i_buf_it
