@@ -14,8 +14,10 @@ Description:
 
 #include "meat_trace.h"
 
+#if !defined(__CYGWIN__)
 /* For backtrace() */
 #include <execinfo.h>
+#endif /* #if !defined(__CYGWIN__) */
 
 static char b_meat_trace_init_done = 0;
 
@@ -76,9 +78,16 @@ meat_trace_capture(
     if (
         b_meat_trace_init_done)
     {
+#if !defined(__CYGWIN__)
         backtrace(
             a_stack,
             i_count);
+#else /* #if !defined(__CYGWIN__) */
+        (void)(
+            a_stack);
+        (void)(
+            i_count);
+#endif /* #if !defined(__CYGWIN__) */
 
     }
 
@@ -101,10 +110,17 @@ meat_trace_report(
     if (
         b_meat_trace_init_done)
     {
+#if !defined(__CYGWIN__)
         backtrace_symbols_fd(
             a_stack,
             i_count,
             1);
+#else /* #if !defined(__CYGWIN__) */
+        (void)(
+            a_stack);
+        (void)(
+            i_count);
+#endif /* #if !defined(__CYGWIN__) */
 
     }
 

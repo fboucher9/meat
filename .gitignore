@@ -1,4 +1,5 @@
 meat
+*.exe
 tags
 games.txt
 _obj_*
