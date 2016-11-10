@@ -16,6 +16,8 @@ Description:
 
 char
     meat_file_init(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_file * const
             p_file,
         enum meat_file_type const
@@ -25,6 +27,9 @@ char
 {
     char
         b_result;
+
+    (void)(
+        p_ctxt);
 
     if (
         meat_file_type_stdin
@@ -122,9 +127,14 @@ char
 
 void
     meat_file_cleanup(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_file * const
             p_file)
 {
+    (void)(
+        p_ctxt);
+
     if (
         p_file->p_private)
     {
@@ -146,11 +156,16 @@ void
 
 int
     meat_file_read_char(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_file * const
             p_file)
 {
     int
         i_data;
+
+    (void)(
+        p_ctxt);
 
     if (
         p_file->p_private)
@@ -172,11 +187,16 @@ int
 
 void
     meat_file_write_char(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_file * const
             p_file,
         int const
             c_data)
 {
+    (void)(
+        p_ctxt);
+
     if (
         p_file->p_private)
     {

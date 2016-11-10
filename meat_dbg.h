@@ -32,8 +32,8 @@ Description:
 */
 struct meat_dbg
 {
-    void *
-        p_dummy;
+    char
+        b_init;
 
 }; /* struct meat_dbg */
 
@@ -42,6 +42,26 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_dbg_break(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_dbg * const
+        p_dbg);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+void
+meat_dbg_init(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_dbg * const
+        p_dbg);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+void
+meat_dbg_cleanup(
     struct meat_ctxt * const
         p_ctxt,
     struct meat_dbg * const

@@ -53,5 +53,34 @@ meat_dbg_break(
 
 } /* meat_dbg_break() */
 
-/* end-of-file: meat_dbg.c */
+void
+meat_dbg_init(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_dbg * const
+        p_dbg)
+{
+    (void)(
+        p_ctxt);
 
+    p_dbg->b_init =
+        1;
+
+} /* meat_dbg_init() */
+
+void
+meat_dbg_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_dbg * const
+        p_dbg)
+{
+    (void)(
+        p_ctxt);
+
+    p_dbg->b_init =
+        0;
+
+} /* meat_dbg_cleanup() */
+
+/* end-of-file: meat_dbg.c */

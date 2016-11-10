@@ -220,6 +220,7 @@ char
 
         i_char =
             meat_file_read_char(
+                p_ctxt,
                 p_file);
 
         if (

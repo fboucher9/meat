@@ -21,6 +21,12 @@ Description:
 
 #define INC_MEAT_FILE_H
 
+/* Predefine context handle */
+struct meat_ctxt;
+
+/* Predefine file handle */
+struct meat_file;
+
 /*
 
 Enumeration: meat_file_type
@@ -61,6 +67,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 char
 meat_file_init(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_file * const
         p_file,
     enum meat_file_type const
@@ -73,6 +81,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_file_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_file * const
         p_file);
 
@@ -81,6 +91,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 int
 meat_file_read_char(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_file * const
         p_file);
 
@@ -89,6 +101,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_file_write_char(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_file * const
         p_file,
     int const

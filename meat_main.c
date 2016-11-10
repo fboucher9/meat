@@ -10,11 +10,11 @@ Description:
 
 #include "meat_os.h"
 
+#include "meat_main.h"
+
 #include "meat_list.h"
 
 #include "meat_time.h"
-
-#include "meat_main.h"
 
 #include "meat_heap.h"
 
@@ -66,6 +66,8 @@ Interface:
 static
 void
 print_string(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_file * const
         p_file,
     char const * const
@@ -82,6 +84,7 @@ print_string(
             p_msg))
     {
         meat_file_write_char(
+            p_ctxt,
             p_file,
             *(
                 p_msg));
@@ -147,6 +150,7 @@ void
                 sizeof(ac_game_time));
 
         print_string(
+            p_ctxt,
             p_file_out,
             ac_game_time);
 
@@ -156,6 +160,7 @@ void
                 < 28)
             {
                 meat_file_write_char(
+                    p_ctxt,
                     p_file_out,
                     ' ');
 
@@ -164,10 +169,12 @@ void
         }
 
         print_string(
+            p_ctxt,
             p_file_out,
             p_game->a_remarks);
 
         meat_file_write_char(
+            p_ctxt,
             p_file_out,
             '\n');
     }
@@ -218,6 +225,13 @@ void
         struct meat_main_impl * const
             p_main)
 {
+    struct meat_ctxt *
+        p_ctxt;
+
+    p_ctxt =
+        &(
+            p_main->o_ctxt);
+
     {
         /* Print the selected range */
         char
@@ -237,26 +251,31 @@ void
             sizeof(ac_range_end));
 
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             "Range from ");
 
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             ac_range_begin);
 
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             " to ");
 
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             ac_range_end);
 
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             "\n");
@@ -319,6 +338,11 @@ char
         &(
             p_main->o_heap);
 
+    meat_dbg_init(
+        p_ctxt,
+        &(
+            p_main->o_dbg));
+
     meat_trace_init(
         p_ctxt,
         &(
@@ -330,6 +354,7 @@ char
             p_main->o_heap));
 
     meat_file_init(
+        p_ctxt,
         &(
             p_main->o_file_out),
         meat_file_type_stdout,
@@ -349,6 +374,7 @@ char
 
         p_main->b_input =
             meat_file_init(
+                p_ctxt,
                 &(
                     p_main->o_file_in),
                 meat_file_type_stdin,
@@ -366,6 +392,7 @@ char
                         p_main->o_file_in)))
             {
                 meat_file_cleanup(
+                    p_ctxt,
                     &(
                         p_main->o_file_in));
 
@@ -399,6 +426,7 @@ char
                     p_main->b_input)
                 {
                     meat_file_cleanup(
+                        p_ctxt,
                         &(
                             p_main->o_file_in));
 
@@ -416,6 +444,7 @@ char
     else
     {
         print_string(
+            p_ctxt,
             &(
                 p_main->o_file_out),
             "wha?\n");
@@ -432,6 +461,7 @@ char
                 p_main->o_opts));
 
         meat_file_cleanup(
+            p_ctxt,
             &(
                 p_main->o_file_out));
 
@@ -444,6 +474,11 @@ char
             p_ctxt,
             &(
                 p_main->o_trace));
+
+        meat_dbg_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_dbg));
     }
 
     return
@@ -473,6 +508,7 @@ void
         p_main->b_input)
     {
         meat_file_cleanup(
+            p_ctxt,
             &(
                 p_main->o_file_in));
 
@@ -481,6 +517,7 @@ void
     }
 
     meat_file_cleanup(
+        p_ctxt,
         &(
             p_main->o_file_out));
 
@@ -497,6 +534,11 @@ void
         p_ctxt,
         &(
             p_main->o_trace));
+
+    meat_dbg_cleanup(
+        p_ctxt,
+        &(
+            p_main->o_dbg));
 
 } /* meat_main_cleanup() */
 
