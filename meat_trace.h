@@ -21,23 +21,44 @@ Description:
 
 #define INC_MEAT_TRACE_H
 
-#if defined(__cplusplus)
-extern "C"
-#endif /* #if defined(__cplusplus) */
-void
-meat_trace_init(void);
+struct meat_ctxt;
+
+struct meat_trace
+{
+    char
+        b_init;
+
+}; /* struct meat_trace */
 
 #if defined(__cplusplus)
 extern "C"
 #endif /* #if defined(__cplusplus) */
 void
-meat_trace_cleanup(void);
+meat_trace_init(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+void
+meat_trace_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace);
 
 #if defined(__cplusplus)
 extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_trace_capture(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace,
     void * * const
         a_stack,
     unsigned int const
@@ -48,6 +69,10 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_trace_report(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace,
     void * * const
         a_stack,
     unsigned int const

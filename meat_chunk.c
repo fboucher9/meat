@@ -18,6 +18,8 @@ Description:
 
 #include "meat_heap.h"
 
+#include "meat_ctxt.h"
+
 /*
 
 Function: meat_chunk_list_init
@@ -27,9 +29,14 @@ Description:
 */
 void
 meat_chunk_list_init(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list)
 {
+    (void)(
+        p_ctxt);
+
     meat_list_init(
         &(
             p_chunk_list->o_list));
@@ -48,6 +55,8 @@ Description:
 */
 void
 meat_chunk_list_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list)
 {
@@ -76,6 +85,8 @@ meat_chunk_list_cleanup(
             p_iterator);
 
         meat_heap_free(
+            p_ctxt,
+            p_ctxt->p_heap,
             (void *)(
                 p_iterator));
 
@@ -100,6 +111,8 @@ Description:
 */
 void
 meat_chunk_list_write(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list,
     unsigned char const
@@ -146,6 +159,8 @@ meat_chunk_list_write(
         p_chunk =
             (struct meat_chunk *)(
                 meat_heap_alloc(
+                    p_ctxt,
+                    p_ctxt->p_heap,
                     sizeof(
                         struct meat_chunk)));
 
@@ -188,6 +203,8 @@ Description:
 */
 void
 meat_chunk_list_read(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list,
     unsigned char * const
@@ -200,6 +217,9 @@ meat_chunk_list_read(
 
     struct meat_list *
         p_list_it;
+
+    (void)(
+        p_ctxt);
 
     i_buf_it =
         0u;

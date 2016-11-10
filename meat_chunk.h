@@ -22,6 +22,9 @@ Description:
 
 #define INC_MEAT_CHUNK_H
 
+/* Predefine */
+struct meat_ctxt;
+
 /* Number of characters in a single chunk */
 #define MEAT_CHUNK_BUFFER_LENGTH 32u
 
@@ -63,6 +66,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_chunk_list_init(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list);
 
@@ -71,6 +76,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_chunk_list_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list);
 
@@ -79,6 +86,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_chunk_list_write(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list,
     unsigned char const
@@ -89,6 +98,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_chunk_list_read(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_chunk_list * const
         p_chunk_list,
     unsigned char * const

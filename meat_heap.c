@@ -18,6 +18,8 @@ Description:
 
 #include "meat_trace.h"
 
+#include "meat_ctxt.h"
+
 /* For malloc and free, ... */
 #include <stdlib.h>
 
@@ -119,6 +121,10 @@ Comments:
 */
 void *
 meat_heap_alloc(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_heap * const
+        p_heap,
     size_t const
         i_buf_len)
 {
@@ -126,7 +132,7 @@ meat_heap_alloc(
         p_buf;
 
     if (
-        b_meat_heap_init_done)
+        p_heap->b_init)
     {
         struct meat_heap_prefix *
             p_prefix;
@@ -173,6 +179,8 @@ meat_heap_alloc(
                     p_prefix->o_list));
 
             meat_trace_capture(
+                p_ctxt,
+                p_ctxt->p_trace,
                 p_prefix->a_stack,
                 5u);
 
@@ -216,7 +224,9 @@ meat_heap_alloc(
         }
         else
         {
-            meat_dbg_break();
+            meat_dbg_break(
+                p_ctxt,
+                p_ctxt->p_dbg);
 
             p_buf =
                 0;
@@ -224,7 +234,9 @@ meat_heap_alloc(
     }
     else
     {
-        meat_dbg_break();
+        meat_dbg_break(
+            p_ctxt,
+            p_ctxt->p_dbg);
 
         p_buf =
             0;
@@ -247,11 +259,18 @@ Description:
 */
 void
 meat_heap_free(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_heap * const
+        p_heap,
     void * const
         p_buf)
 {
+    (void)(
+        p_ctxt);
+
     if (
-        b_meat_heap_init_done)
+        p_heap->b_init)
     {
         struct meat_heap_prefix *
             p_prefix;
@@ -293,7 +312,9 @@ meat_heap_free(
                         MEAT_HEAP_FOOTER_SIGNATURE
                         != p_suffix->a_footer[i]))
                 {
-                    meat_dbg_break();
+                    meat_dbg_break(
+                        p_ctxt,
+                        p_ctxt->p_dbg);
 
                     break;
                 }
@@ -318,7 +339,9 @@ meat_heap_free(
     }
     else
     {
-        meat_dbg_break();
+        meat_dbg_break(
+            p_ctxt,
+            p_ctxt->p_dbg);
     }
 
 } /* meat_heap_free() */
@@ -333,14 +356,17 @@ Description:
 
 */
 void
-meat_heap_init(void)
+meat_heap_init(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_heap * const
+        p_heap)
 {
-    if (
-        !b_meat_heap_init_done)
-    {
-        b_meat_heap_init_done =
-            1;
-    }
+    (void)(
+        p_ctxt);
+
+    p_heap->b_init =
+        1;
 
 } /* meat_heap_init() */
 
@@ -354,10 +380,17 @@ Description:
 
 */
 void
-meat_heap_cleanup(void)
+meat_heap_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_heap * const
+        p_heap)
 {
+    (void)(
+        p_ctxt);
+
     if (
-        b_meat_heap_init_done)
+        p_heap->b_init)
     {
         if (o_meat_heap_list.p_next != &o_meat_heap_list)
         {
@@ -380,6 +413,8 @@ meat_heap_cleanup(void)
                 printf("*** allocation of %lu bytes ***\n", (unsigned long int)(p_prefix->i_buf_len));
 
                 meat_trace_report(
+                    p_ctxt,
+                    p_ctxt->p_trace,
                     p_prefix->a_stack,
                     5);
 
@@ -387,7 +422,9 @@ meat_heap_cleanup(void)
                     p_iterator->p_next;
             }
 
-            meat_dbg_break();
+            meat_dbg_break(
+                p_ctxt,
+                p_ctxt->p_dbg);
         }
 
         b_meat_heap_init_done =

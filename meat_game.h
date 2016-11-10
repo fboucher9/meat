@@ -27,6 +27,9 @@ Description:
 #define INC_MEAT_GAME_H
 
 /* Predefine */
+struct meat_ctxt;
+
+/* Predefine */
 struct meat_game;
 
 /* Predefine */
@@ -75,6 +78,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 char
 meat_game_list_init(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_list,
     struct meat_file * const
@@ -85,6 +90,8 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_game_list_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_meat_game_list);
 
@@ -93,9 +100,13 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 void
 meat_game_list_iterate(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_meat_game_list,
     void (* p_callback)(
+        struct meat_ctxt * const
+            p_ctxt,
         void * const
             p_context,
         struct meat_game * const

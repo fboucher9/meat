@@ -37,9 +37,20 @@ Comments:
 
 */
 void
-meat_dbg_break(void)
+meat_dbg_break(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_dbg * const
+        p_dbg)
 {
-    raise(SIGINT);
+    (void)(
+        p_ctxt);
+    (void)(
+        p_dbg);
+
+    raise(
+        SIGINT);
+
 } /* meat_dbg_break() */
 
 /* end-of-file: meat_dbg.c */

@@ -26,6 +26,10 @@ Description:
 
 #include "meat_file.h"
 
+#include "meat_dbg.h"
+
+#include "meat_ctxt.h"
+
 /*
 
 Interface:
@@ -99,6 +103,8 @@ struct meat_game_report_context
 static
 void
     meat_game_report_callback(
+        struct meat_ctxt * const
+            p_ctxt,
         void * const
             p_context,
         struct meat_game * const
@@ -116,6 +122,9 @@ void
     struct meat_file * const
         p_file_out =
         p_report_context->p_file_out;
+
+    (void)(
+        p_ctxt);
 
     if (
         (
@@ -165,6 +174,332 @@ void
 
 } /* meat_game_report_callback() */
 
+/*
+
+Structure: meat_main_impl
+
+Description:
+
+*/
+struct meat_main_impl
+{
+    struct meat_ctxt
+        o_ctxt;
+
+    struct meat_dbg
+        o_dbg;
+
+    struct meat_trace
+        o_trace;
+
+    struct meat_heap
+        o_heap;
+
+    struct meat_opts
+        o_opts;
+
+    struct meat_file
+        o_file_out;
+
+    struct meat_file
+        o_file_in;
+
+    struct meat_game_list
+        o_game_list;
+
+    char
+        b_input;
+
+}; /* struct meat_main_impl */
+
+static
+void
+    meat_main_dispatch(
+        struct meat_main_impl * const
+            p_main)
+{
+    {
+        /* Print the selected range */
+        char
+            ac_range_begin[64u];
+
+        char
+            ac_range_end[64u];
+
+        meat_time_format_date(
+            p_main->o_opts.i_begin,
+            ac_range_begin,
+            sizeof(ac_range_begin));
+
+        meat_time_format_date(
+            p_main->o_opts.i_end,
+            ac_range_end,
+            sizeof(ac_range_end));
+
+        print_string(
+            &(
+                p_main->o_file_out),
+            "Range from ");
+
+        print_string(
+            &(
+                p_main->o_file_out),
+            ac_range_begin);
+
+        print_string(
+            &(
+                p_main->o_file_out),
+            " to ");
+
+        print_string(
+            &(
+                p_main->o_file_out),
+            ac_range_end);
+
+        print_string(
+            &(
+                p_main->o_file_out),
+            "\n");
+    }
+
+    {
+        struct meat_game_report_context
+            o_report_context;
+
+        o_report_context.p_opts =
+            &(
+                p_main->o_opts);
+
+        o_report_context.p_file_out =
+            &(
+                p_main->o_file_out);
+
+        meat_game_list_iterate(
+            &(
+                p_main->o_ctxt),
+            &(
+                p_main->o_game_list),
+            &(
+                meat_game_report_callback),
+            &(
+                o_report_context));
+    }
+
+} /* meat_main_dispatch() */
+
+static
+char
+    meat_main_init(
+        struct meat_main_impl * const
+            p_main,
+        unsigned int const
+            argc,
+        char const * const * const
+            argv)
+{
+    char
+        b_result;
+
+    struct meat_ctxt *
+        p_ctxt;
+
+    p_ctxt =
+        &(
+            p_main->o_ctxt);
+
+    p_ctxt->p_dbg =
+        &(
+            p_main->o_dbg);
+
+    p_ctxt->p_trace =
+        &(
+            p_main->o_trace);
+
+    p_ctxt->p_heap =
+        &(
+            p_main->o_heap);
+
+    meat_trace_init(
+        p_ctxt,
+        &(
+            p_main->o_trace));
+
+    meat_heap_init(
+        p_ctxt,
+        &(
+            p_main->o_heap));
+
+    meat_file_init(
+        &(
+            p_main->o_file_out),
+        meat_file_type_stdout,
+        NULL);
+
+    meat_opts_init(
+        &(
+            p_main->o_opts),
+        argc,
+        argv);
+
+    if (
+        p_main->o_opts.i_end
+        > p_main->o_opts.i_begin)
+    {
+        p_main->o_opts.i_end -= 10;
+
+        p_main->b_input =
+            meat_file_init(
+                &(
+                    p_main->o_file_in),
+                meat_file_type_stdin,
+                NULL);
+
+        if (
+            p_main->b_input)
+        {
+            if (
+                meat_game_list_init(
+                    p_ctxt,
+                    &(
+                        p_main->o_game_list),
+                    &(
+                        p_main->o_file_in)))
+            {
+                meat_file_cleanup(
+                    &(
+                        p_main->o_file_in));
+
+                p_main->b_input =
+                    0;
+
+                b_result =
+                    1;
+
+#if 0 /* not used */
+                if (
+                    !b_result)
+                {
+                    meat_game_list_cleanup(
+                        p_ctxt,
+                        &(
+                            p_main->o_game_list));
+                }
+#endif /* not used */
+            }
+            else
+            {
+                b_result =
+                    0;
+            }
+
+            if (
+                !b_result)
+            {
+                if (
+                    p_main->b_input)
+                {
+                    meat_file_cleanup(
+                        &(
+                            p_main->o_file_in));
+
+                    p_main->b_input =
+                        0;
+                }
+            }
+        }
+        else
+        {
+            b_result =
+                0;
+        }
+    }
+    else
+    {
+        print_string(
+            &(
+                p_main->o_file_out),
+            "wha?\n");
+
+        b_result =
+            0;
+    }
+
+    if (
+        !b_result)
+    {
+        meat_opts_cleanup(
+            &(
+                p_main->o_opts));
+
+        meat_file_cleanup(
+            &(
+                p_main->o_file_out));
+
+        meat_heap_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_heap));
+
+        meat_trace_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_trace));
+    }
+
+    return
+        b_result;
+
+} /* meat_main_init() */
+
+static
+void
+    meat_main_cleanup(
+        struct meat_main_impl * const
+            p_main)
+{
+    struct meat_ctxt *
+        p_ctxt;
+
+    p_ctxt =
+        &(
+            p_main->o_ctxt);
+
+    meat_game_list_cleanup(
+        p_ctxt,
+        &(
+            p_main->o_game_list));
+
+    if (
+        p_main->b_input)
+    {
+        meat_file_cleanup(
+            &(
+                p_main->o_file_in));
+
+        p_main->b_input =
+            0;
+    }
+
+    meat_file_cleanup(
+        &(
+            p_main->o_file_out));
+
+    meat_opts_cleanup(
+        &(
+            p_main->o_opts));
+
+    meat_heap_cleanup(
+        p_ctxt,
+        &(
+            p_main->o_heap));
+
+    meat_trace_cleanup(
+        p_ctxt,
+        &(
+            p_main->o_trace));
+
+} /* meat_main_cleanup() */
+
 int
     meat_main(
         unsigned int const
@@ -172,168 +507,28 @@ int
         char const * const * const
             argv)
 {
-    struct meat_opts
-        o_opts;
+    struct meat_main_impl
+        o_main;
 
-    struct meat_file
-        o_file_out;
+    struct meat_main_impl *
+        p_main;
 
-    meat_trace_init();
-
-    meat_heap_init();
-
-    meat_file_init(
+    p_main =
         &(
-            o_file_out),
-        meat_file_type_stdout,
-        NULL);
-
-    meat_opts_init(
-        &(
-            o_opts),
-        argc,
-        argv);
+            o_main);
 
     if (
-        o_opts.i_end
-        > o_opts.i_begin)
+        meat_main_init(
+            p_main,
+            argc,
+            argv))
     {
-        char
-            b_input;
+        meat_main_dispatch(
+            p_main);
 
-        struct meat_file
-            o_file_in;
-
-        o_opts.i_end -= 10;
-
-        b_input =
-            meat_file_init(
-                &(
-                    o_file_in),
-                meat_file_type_stdin,
-                NULL);
-
-        if (
-            b_input)
-        {
-            struct meat_game_list
-                o_game_list;
-
-            if (
-                meat_game_list_init(
-                    &(
-                        o_game_list),
-                    &(
-                        o_file_in)))
-            {
-                meat_file_cleanup(
-                    &(
-                        o_file_in));
-
-                b_input =
-                    0;
-
-                {
-                    /* Print the selected range */
-                    char
-                        ac_range_begin[64u];
-
-                    char
-                        ac_range_end[64u];
-
-                    meat_time_format_date(
-                        o_opts.i_begin,
-                        ac_range_begin,
-                        sizeof(ac_range_begin));
-
-                    meat_time_format_date(
-                        o_opts.i_end,
-                        ac_range_end,
-                        sizeof(ac_range_end));
-
-                    print_string(
-                        &(
-                            o_file_out),
-                        "Range from ");
-
-                    print_string(
-                        &(
-                            o_file_out),
-                        ac_range_begin);
-
-                    print_string(
-                        &(
-                            o_file_out),
-                        " to ");
-
-                    print_string(
-                        &(
-                            o_file_out),
-                        ac_range_end);
-
-                    print_string(
-                        &(
-                            o_file_out),
-                        "\n");
-                }
-
-                {
-                    struct meat_game_report_context
-                        o_report_context;
-
-                    o_report_context.p_opts =
-                        &(
-                            o_opts);
-
-                    o_report_context.p_file_out =
-                        &(
-                            o_file_out);
-
-                    meat_game_list_iterate(
-                        &(
-                            o_game_list),
-                        &(
-                            meat_game_report_callback),
-                        &(
-                            o_report_context));
-                }
-
-                meat_game_list_cleanup(
-                    &(
-                        o_game_list));
-            }
-
-            if (
-                b_input)
-            {
-                meat_file_cleanup(
-                    &(
-                        o_file_in));
-
-                b_input =
-                    0;
-            }
-        }
+        meat_main_cleanup(
+            p_main);
     }
-    else
-    {
-        print_string(
-            &(
-                o_file_out),
-            "wha?\n");
-    }
-
-    meat_file_cleanup(
-        &(
-            o_file_out));
-
-    meat_opts_cleanup(
-        &(
-            o_opts));
-
-    meat_heap_cleanup();
-
-    meat_trace_cleanup();
 
     return 0;
 

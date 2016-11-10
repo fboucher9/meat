@@ -24,6 +24,8 @@ Description:
 
 #include "meat_chunk.h"
 
+#include "meat_ctxt.h"
+
 struct line_info
 {
     unsigned char *
@@ -37,6 +39,8 @@ struct line_info
 static
 char
     process_line(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_game_list * const
             p_game_list,
         struct line_info * const
@@ -54,6 +58,8 @@ char
     p_game =
         (struct meat_game *)(
             meat_heap_alloc(
+                p_ctxt,
+                p_ctxt->p_heap,
                 sizeof(
                     struct meat_game)));
 
@@ -172,6 +178,8 @@ char
 static
 char
     read_line(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_file * const
             p_file,
         struct line_info * const
@@ -193,6 +201,7 @@ char
         1;
 
     meat_chunk_list_init(
+        p_ctxt,
         &(
             o_chunk_list));
 
@@ -225,6 +234,7 @@ char
             else
             {
                 meat_chunk_list_write(
+                    p_ctxt,
                     &(
                         o_chunk_list),
                     (unsigned char)(
@@ -249,12 +259,15 @@ char
     {
         p_line_info->p_buf =
             meat_heap_alloc(
+                p_ctxt,
+                p_ctxt->p_heap,
                 o_chunk_list.i_total_len + 1);
 
         if (
             p_line_info->p_buf)
         {
             meat_chunk_list_read(
+                p_ctxt,
                 &(
                     o_chunk_list),
                 p_line_info->p_buf,
@@ -269,6 +282,7 @@ char
     }
 
     meat_chunk_list_cleanup(
+        p_ctxt,
         &(
             o_chunk_list));
 
@@ -280,6 +294,8 @@ char
 static
 char
     process_file(
+        struct meat_ctxt * const
+            p_ctxt,
         struct meat_game_list * const
             p_game_list,
         struct meat_file * const
@@ -299,6 +315,7 @@ char
 
         b_continue =
             read_line(
+                p_ctxt,
                 p_file,
                 &(
                     o_line_info));
@@ -308,6 +325,7 @@ char
         {
             b_continue =
                 process_line(
+                    p_ctxt,
                     p_game_list,
                     &(
                         o_line_info));
@@ -316,6 +334,8 @@ char
                 o_line_info.p_buf)
             {
                 meat_heap_free(
+                    p_ctxt,
+                    p_ctxt->p_heap,
                     o_line_info.p_buf);
 
                 o_line_info.p_buf =
@@ -357,6 +377,8 @@ char
 /* Load games from input file */
 char
 meat_game_list_init(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_game_list,
     struct meat_file * const
@@ -368,6 +390,7 @@ meat_game_list_init(
 
     return
         process_file(
+            p_ctxt,
             p_game_list,
             p_file);
 
@@ -375,6 +398,8 @@ meat_game_list_init(
 
 void
 meat_game_list_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_game_list)
 {
@@ -410,6 +435,8 @@ meat_game_list_cleanup(
                 p_game->o_list));
 
         meat_heap_free(
+            p_ctxt,
+            p_ctxt->p_heap,
             (void *)(
                 p_game));
 
@@ -421,7 +448,12 @@ meat_game_list_cleanup(
 
 struct meat_game_list_iterate_context
 {
+    struct meat_ctxt *
+        p_ctxt;
+
     void (* p_callback)(
+        struct meat_ctxt * const
+            p_ctxt,
         void * const
             p_context,
         struct meat_game * const
@@ -455,6 +487,7 @@ meat_game_list_iterate_callback(
             p_list);
 
     (*p_game_list_iterate_context->p_callback)(
+        p_game_list_iterate_context->p_ctxt,
         p_game_list_iterate_context->p_context,
         p_game);
 
@@ -462,9 +495,13 @@ meat_game_list_iterate_callback(
 
 void
 meat_game_list_iterate(
+    struct meat_ctxt * const
+        p_ctxt,
     struct meat_game_list * const
         p_game_list,
     void (* p_callback)(
+        struct meat_ctxt * const
+            p_ctxt,
         void * const
             p_context,
         struct meat_game * const
@@ -474,6 +511,9 @@ meat_game_list_iterate(
 {
     struct meat_game_list_iterate_context
         o_game_list_iterate_context;
+
+    o_game_list_iterate_context.p_ctxt =
+        p_ctxt;
 
     o_game_list_iterate_context.p_callback =
         p_callback;

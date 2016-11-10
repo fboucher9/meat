@@ -28,8 +28,6 @@ Description:
 
 #endif /* #if !defined(__CYGWIN__) */
 
-static char b_meat_trace_init_done = 0;
-
 /*
 
 Function: meat_trace_init
@@ -38,9 +36,16 @@ Description:
 
 */
 void
-meat_trace_init(void)
+meat_trace_init(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace)
 {
-    b_meat_trace_init_done =
+    (void)(
+        p_ctxt);
+
+    p_trace->b_init =
         1;
 
 } /* meat_trace_init() */
@@ -53,9 +58,16 @@ Description:
 
 */
 void
-meat_trace_cleanup(void)
+meat_trace_cleanup(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace)
 {
-    b_meat_trace_init_done =
+    (void)(
+        p_ctxt);
+
+    p_trace->b_init =
         0;
 
 } /* meat_trace_cleanup() */
@@ -69,13 +81,20 @@ Description:
 */
 void
 meat_trace_capture(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace,
     void * * const
         a_stack,
     unsigned int const
         i_count)
 {
+    (void)(
+        p_ctxt);
+
     if (
-        b_meat_trace_init_done)
+        p_trace->b_init)
     {
 #if !defined(__CYGWIN__)
         backtrace(
@@ -101,13 +120,20 @@ Description:
 */
 void
 meat_trace_report(
+    struct meat_ctxt * const
+        p_ctxt,
+    struct meat_trace * const
+        p_trace,
     void * * const
         a_stack,
     unsigned int const
         i_count)
 {
+    (void)(
+        p_ctxt);
+
     if (
-        b_meat_trace_init_done)
+        p_trace->b_init)
     {
 #if !defined(__CYGWIN__)
 
@@ -139,6 +165,15 @@ meat_trace_report(
             p_stack_item =
                 a_stack[i_index];
 
+            fprintf(
+                stdout,
+                "[%d] %p -- ",
+                i_index,
+                p_stack_item);
+
+            fflush(
+                stdout);
+
             i_result =
                 dladdr(
                     p_stack_item,
@@ -149,28 +184,25 @@ meat_trace_report(
                 0
                 != i_result)
             {
-                fprintf(stdout,
-                    "[%d] %p -- ",
-                    i_index,
+                char
+                    a_line[256u];
+
+                sprintf(
+                    a_line,
+                    "addr2line -e %s -f -s %p",
+                    o_info.dli_fname,
                     p_stack_item);
 
-                fflush(stdout);
-
-                {
-                    char
-                        a_line[256u];
-
-                    sprintf(
-                        a_line,
-                        "addr2line -e %s -f -s %p",
-                        o_info.dli_fname,
-                        p_stack_item);
-
-                    system(a_line);
-                }
+                system(a_line);
             }
             else
             {
+                fprintf(
+                    stdout,
+                    "\n");
+
+                fflush(
+                    stdout);
             }
 
             i_index ++;
