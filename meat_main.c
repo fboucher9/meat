@@ -178,8 +178,7 @@ int
     struct meat_file
         o_file_out;
 
-    meat_trace_init(
-        argv[0u]);
+    meat_trace_init();
 
     meat_heap_init();
 

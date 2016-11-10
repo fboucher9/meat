@@ -25,9 +25,7 @@ Description:
 extern "C"
 #endif /* #if defined(__cplusplus) */
 void
-meat_trace_init(
-    char const * const
-        p_argv0);
+meat_trace_init(void);
 
 #if defined(__cplusplus)
 extern "C"

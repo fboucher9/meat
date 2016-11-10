@@ -15,13 +15,20 @@ Description:
 #include "meat_trace.h"
 
 #if !defined(__CYGWIN__)
+
 /* For backtrace() */
 #include <execinfo.h>
+
+/* For dladdr() */
+#define __USE_GNU
+#include <dlfcn.h>
+
+/* For system() */
+#include <stdlib.h>
+
 #endif /* #if !defined(__CYGWIN__) */
 
 static char b_meat_trace_init_done = 0;
-
-static char const * p_meat_trace_argv0 = NULL;
 
 /*
 
@@ -31,15 +38,10 @@ Description:
 
 */
 void
-meat_trace_init(
-    char const * const
-        p_argv0)
+meat_trace_init(void)
 {
     b_meat_trace_init_done =
         1;
-
-    p_meat_trace_argv0 =
-        p_argv0;
 
 } /* meat_trace_init() */
 
@@ -55,9 +57,6 @@ meat_trace_cleanup(void)
 {
     b_meat_trace_init_done =
         0;
-
-    p_meat_trace_argv0 =
-        NULL;
 
 } /* meat_trace_cleanup() */
 
@@ -111,10 +110,72 @@ meat_trace_report(
         b_meat_trace_init_done)
     {
 #if !defined(__CYGWIN__)
+
+#if 0 /* fallback method */
         backtrace_symbols_fd(
             a_stack,
             i_count,
             1);
+#endif /* fallback method */
+
+        unsigned int
+            i_index;
+
+        i_index =
+            0u;
+
+        while (
+            i_index < i_count)
+        {
+            void *
+                p_stack_item;
+
+            Dl_info
+                o_info;
+
+            int
+                i_result;
+
+            p_stack_item =
+                a_stack[i_index];
+
+            i_result =
+                dladdr(
+                    p_stack_item,
+                    &(
+                        o_info));
+
+            if (
+                0
+                != i_result)
+            {
+                fprintf(stdout,
+                    "[%d] %p -- ",
+                    i_index,
+                    p_stack_item);
+
+                fflush(stdout);
+
+                {
+                    char
+                        a_line[256u];
+
+                    sprintf(
+                        a_line,
+                        "addr2line -e %s -f -s %p",
+                        o_info.dli_fname,
+                        p_stack_item);
+
+                    system(a_line);
+                }
+            }
+            else
+            {
+            }
+
+            i_index ++;
+        }
+
 #else /* #if !defined(__CYGWIN__) */
         (void)(
             a_stack);

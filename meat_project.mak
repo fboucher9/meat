@@ -19,7 +19,7 @@ MEAT_CFLAGS := $(CFLAGS) -ansi -pedantic -Wall -Wextra -g -O0 -I$(MEAT_DST_PATH)
 endif
 
 ifndef MEAT_LDFLAGS
-MEAT_LDFLAGS := $(LDFLAGS) -rdynamic
+MEAT_LDFLAGS := $(LDFLAGS) -rdynamic -ldl
 endif
 
 MEAT_SRCS := \
