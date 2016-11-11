@@ -75,7 +75,7 @@ signed long int
 }
 
 signed long int
-    meat_time_init_day(
+    meat_time_get_stamp_from_info(
         struct meat_time_info const * const
             p_info)
 {
@@ -117,7 +117,7 @@ signed long int
 }
 
 void
-    meat_time_get_day(
+    meat_time_get_info_from_stamp(
         signed long int const
             base,
         struct meat_time_info * const
@@ -171,7 +171,7 @@ signed long int
     struct meat_time_info
         o_now;
 
-    meat_time_get_day(
+    meat_time_get_info_from_stamp(
         i_now,
         &(
             o_now));
@@ -203,7 +203,7 @@ signed long int
     struct meat_time_info
         o_now;
 
-    meat_time_get_day(
+    meat_time_get_info_from_stamp(
         i_now,
         &(
             o_now));
@@ -235,7 +235,7 @@ signed long int
     struct meat_time_info
         o_now;
 
-    meat_time_get_day(
+    meat_time_get_info_from_stamp(
         i_now,
         &(
             o_now));
@@ -404,7 +404,7 @@ void
 }
 
 size_t
-meat_time_format_date(
+meat_time_format_stamp(
     signed long int const
         i_now,
     char * const
@@ -537,7 +537,7 @@ meat_time_which_month(
 }
 
 int
-meat_time_which_wday(
+meat_time_which_day_of_week(
     char const * const
         p_arg)
 {
@@ -598,7 +598,7 @@ meat_time_which_wday(
 }
 
 signed long int
-meat_time_now(void)
+meat_time_get_stamp_now(void)
 {
     return
         (signed long int)(

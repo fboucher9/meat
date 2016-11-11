@@ -106,7 +106,7 @@ char
             o_game_time.i_month --;
 
             p_game->i_game_time =
-                meat_time_init_day(
+                meat_time_get_stamp_from_info(
                     &(
                         o_game_time));
 

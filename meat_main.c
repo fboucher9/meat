@@ -6,6 +6,8 @@ Module: meat_main.c
 
 Description:
 
+    OS-independant main entry point of meat application.
+
 */
 
 #include "meat_os.h"
@@ -29,39 +31,6 @@ Description:
 #include "meat_dbg.h"
 
 #include "meat_ctxt.h"
-
-/*
-
-Interface:
-
-    this week
-    next week
-    last week
-    next n weeks
-    last n weeks
-
-    this month
-    next month
-    last month
-    next n months
-    last n months
-
-    first week of month
-    week of x [y [year]]
-    month of x [year]
-
-    this year
-    next year
-    last year
-
-    next game
-    last game
-    next N games
-    last N games
-
-    from date to date
-
-*/
 
 static
 void
@@ -92,94 +61,6 @@ print_string(
         p_msg ++;
     }
 }
-
-struct meat_game_report_context
-{
-    struct meat_opts *
-        p_opts;
-
-    struct meat_file *
-        p_file_out;
-
-}; /* struct meat_game_report_context */
-
-static
-void
-    meat_game_report_callback(
-        struct meat_ctxt * const
-            p_ctxt,
-        void * const
-            p_context,
-        struct meat_game * const
-            p_game)
-{
-    struct meat_game_report_context *
-        p_report_context =
-        (struct meat_game_report_context *)(
-            p_context);
-
-    struct meat_opts * const
-        p_opts =
-        p_report_context->p_opts;
-
-    struct meat_file * const
-        p_file_out =
-        p_report_context->p_file_out;
-
-    (void)(
-        p_ctxt);
-
-    if (
-        (
-            p_game->i_game_time
-            >= p_opts->i_begin)
-        && (
-            p_game->i_game_time
-            <= p_opts->i_end))
-    {
-        char
-            ac_game_time[64u];
-
-        unsigned int
-            i_date_len;
-
-        i_date_len =
-            meat_time_format_date(
-                p_game->i_game_time,
-                ac_game_time,
-                sizeof(ac_game_time));
-
-        print_string(
-            p_ctxt,
-            p_file_out,
-            ac_game_time);
-
-        {
-            while (
-                i_date_len
-                < 28)
-            {
-                meat_file_write_char(
-                    p_ctxt,
-                    p_file_out,
-                    ' ');
-
-                i_date_len ++;
-            }
-        }
-
-        print_string(
-            p_ctxt,
-            p_file_out,
-            p_game->a_remarks);
-
-        meat_file_write_char(
-            p_ctxt,
-            p_file_out,
-            '\n');
-    }
-
-} /* meat_game_report_callback() */
 
 /*
 
@@ -221,7 +102,145 @@ struct meat_main_impl
 
 static
 void
-    meat_main_dispatch(
+    meat_main_impl_game_list_report_callback(
+        struct meat_ctxt * const
+            p_ctxt,
+        void * const
+            p_context,
+        struct meat_game * const
+            p_game)
+{
+    struct meat_main_impl * const
+        p_main =
+        p_context;
+
+    struct meat_opts * const
+        p_opts =
+        &(
+            p_main->o_opts);
+
+    struct meat_file * const
+        p_file_out =
+        &(
+            p_main->o_file_out);
+
+    if (
+        (
+            p_game->i_game_time
+            >= p_opts->i_begin)
+        && (
+            p_game->i_game_time
+            <= p_opts->i_end))
+    {
+        char
+            ac_game_time[64u];
+
+        unsigned int
+            i_date_len;
+
+        i_date_len =
+            meat_time_format_stamp(
+                p_game->i_game_time,
+                ac_game_time,
+                sizeof(ac_game_time));
+
+        print_string(
+            p_ctxt,
+            p_file_out,
+            ac_game_time);
+
+        {
+            while (
+                i_date_len
+                < 28)
+            {
+                meat_file_write_char(
+                    p_ctxt,
+                    p_file_out,
+                    ' ');
+
+                i_date_len ++;
+            }
+        }
+
+        print_string(
+            p_ctxt,
+            p_file_out,
+            p_game->a_remarks);
+
+        meat_file_write_char(
+            p_ctxt,
+            p_file_out,
+            '\n');
+    }
+
+} /* meat_main_impl_game_list_report_callback() */
+
+/* Print the selected range */
+static
+void
+meat_main_impl_show_range(
+    struct meat_main_impl * const
+        p_main)
+{
+    struct meat_ctxt *
+        p_ctxt;
+
+    char
+        ac_range_begin[64u];
+
+    char
+        ac_range_end[64u];
+
+    p_ctxt =
+        &(
+            p_main->o_ctxt);
+
+    meat_time_format_stamp(
+        p_main->o_opts.i_begin,
+        ac_range_begin,
+        sizeof(ac_range_begin));
+
+    meat_time_format_stamp(
+        p_main->o_opts.i_end,
+        ac_range_end,
+        sizeof(ac_range_end));
+
+    print_string(
+        p_ctxt,
+        &(
+            p_main->o_file_out),
+        "Range from ");
+
+    print_string(
+        p_ctxt,
+        &(
+            p_main->o_file_out),
+        ac_range_begin);
+
+    print_string(
+        p_ctxt,
+        &(
+            p_main->o_file_out),
+        " to ");
+
+    print_string(
+        p_ctxt,
+        &(
+            p_main->o_file_out),
+        ac_range_end);
+
+    print_string(
+        p_ctxt,
+        &(
+            p_main->o_file_out),
+        "\n");
+
+} /* meat_main_impl_show_range() */
+
+static
+void
+    meat_main_impl_game_list_report(
         struct meat_main_impl * const
             p_main)
 {
@@ -232,83 +251,43 @@ void
         &(
             p_main->o_ctxt);
 
-    {
-        /* Print the selected range */
-        char
-            ac_range_begin[64u];
+    meat_game_list_iterate(
+        &(
+            p_main->o_ctxt),
+        &(
+            p_main->o_game_list),
+        &(
+            meat_main_impl_game_list_report_callback),
+        p_main);
 
-        char
-            ac_range_end[64u];
+} /* meat_main_impl_game_list_report() */
 
-        meat_time_format_date(
-            p_main->o_opts.i_begin,
-            ac_range_begin,
-            sizeof(ac_range_begin));
+static
+int
+    meat_main_impl_dispatch(
+        struct meat_main_impl * const
+            p_main)
+{
+    int
+        i_result;
 
-        meat_time_format_date(
-            p_main->o_opts.i_end,
-            ac_range_end,
-            sizeof(ac_range_end));
+    meat_main_impl_show_range(
+        p_main);
 
-        print_string(
-            p_ctxt,
-            &(
-                p_main->o_file_out),
-            "Range from ");
+    meat_main_impl_game_list_report(
+        p_main);
 
-        print_string(
-            p_ctxt,
-            &(
-                p_main->o_file_out),
-            ac_range_begin);
+    i_result =
+        0;
 
-        print_string(
-            p_ctxt,
-            &(
-                p_main->o_file_out),
-            " to ");
-
-        print_string(
-            p_ctxt,
-            &(
-                p_main->o_file_out),
-            ac_range_end);
-
-        print_string(
-            p_ctxt,
-            &(
-                p_main->o_file_out),
-            "\n");
-    }
-
-    {
-        struct meat_game_report_context
-            o_report_context;
-
-        o_report_context.p_opts =
-            &(
-                p_main->o_opts);
-
-        o_report_context.p_file_out =
-            &(
-                p_main->o_file_out);
-
-        meat_game_list_iterate(
-            &(
-                p_main->o_ctxt),
-            &(
-                p_main->o_game_list),
-            &(
-                meat_game_report_callback),
-            &(
-                o_report_context));
-    }
+    return
+        i_result;
 
 } /* meat_main_dispatch() */
 
 static
 char
-    meat_main_init(
+    meat_main_impl_init(
         struct meat_main_impl * const
             p_main,
         unsigned int const
@@ -484,11 +463,11 @@ char
     return
         b_result;
 
-} /* meat_main_init() */
+} /* meat_main_impl_init() */
 
 static
 void
-    meat_main_cleanup(
+    meat_main_impl_cleanup(
         struct meat_main_impl * const
             p_main)
 {
@@ -540,8 +519,18 @@ void
         &(
             p_main->o_dbg));
 
-} /* meat_main_cleanup() */
+} /* meat_main_impl_cleanup() */
 
+/*
+
+Function: meat_main
+
+Description:
+
+    OS independant entry point of meat application.  Create the main
+    application object, dispatch the commands and then cleanup.
+
+*/
 int
     meat_main(
         unsigned int const
@@ -549,6 +538,9 @@ int
         char const * const * const
             argv)
 {
+    int
+        i_result;
+
     struct meat_main_impl
         o_main;
 
@@ -559,20 +551,31 @@ int
         &(
             o_main);
 
+    /* Create the main application object */
     if (
-        meat_main_init(
+        meat_main_impl_init(
             p_main,
             argc,
             argv))
     {
-        meat_main_dispatch(
-            p_main);
+        /* Dispatch the commands */
+        i_result =
+            meat_main_impl_dispatch(
+                p_main);
 
-        meat_main_cleanup(
+        /* Cleanup */
+        meat_main_impl_cleanup(
             p_main);
     }
+    else
+    {
+        /* Initialization failed */
+        i_result =
+            1;
+    }
 
-    return 0;
+    return
+        i_result;
 
 } /* meat_main() */
 

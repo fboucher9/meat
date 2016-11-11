@@ -69,9 +69,9 @@ void
         i_wday;
 
     i_now =
-        meat_time_now();
+        meat_time_get_stamp_now();
 
-    meat_time_get_day(
+    meat_time_get_info_from_stamp(
         i_now,
         &(
             o_time_now));
@@ -206,7 +206,7 @@ void
                         }
                     }
                 }
-                else if (-1 != (i_wday = meat_time_which_wday(p_argv[2])))
+                else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[2])))
                 {
                     if (i_wday > o_time_now.i_day_of_week)
                     {
@@ -427,7 +427,7 @@ void
             }
 
             i_random_day_of_month =
-                meat_time_init_day(
+                meat_time_get_stamp_from_info(
                     &(
                         o_random_day_of_month));
 
@@ -436,7 +436,7 @@ void
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (-1 != (i_wday = meat_time_which_wday(p_argv[1])))
+        else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[1])))
         {
             meat_time_single_day_range(
                 i_now
