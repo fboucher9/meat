@@ -10,6 +10,10 @@ Description:
 
 #include "meat_os.h"
 
+#include "meat_cfg.h"
+
+#if defined(MEAT_CFG_DBG)
+
 #include "meat_dbg.h"
 
 /* For raise() */
@@ -82,5 +86,7 @@ meat_dbg_cleanup(
         0;
 
 } /* meat_dbg_cleanup() */
+
+#endif /* #if defined(MEAT_CFG_DBG) */
 
 /* end-of-file: meat_dbg.c */

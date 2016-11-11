@@ -10,27 +10,26 @@ Description:
 
 #include "meat_os.h"
 
+#include "meat_cfg.h"
+
 #include "meat_heap.h"
 
 #include "meat_list.h"
 
+#if defined(MEAT_CFG_DBG)
 #include "meat_dbg.h"
+#endif /* #if defined(MEAT_CFG_DBG) */
 
+#if defined(MEAT_CFG_LEAK)
 #include "meat_trace.h"
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
 #include "meat_ctxt.h"
 
 /* For malloc and free, ... */
 #include <stdlib.h>
 
-/* State for meat_heap module */
-static
-char
-b_meat_heap_init_done = 0;
-
-static
-int
-i_meat_heap_count = 0;
+#if defined(MEAT_CFG_LEAK)
 
 static
 struct meat_list
@@ -95,6 +94,8 @@ struct meat_heap_suffix
 
 }; /* struct meat_heap_suffix */
 
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
 /*
 
 Function: meat_heap_alloc
@@ -134,6 +135,7 @@ meat_heap_alloc(
     if (
         p_heap->b_init)
     {
+#if defined(MEAT_CFG_LEAK)
         struct meat_heap_prefix *
             p_prefix;
 
@@ -219,24 +221,34 @@ meat_heap_alloc(
             p_buf =
                 (void *)(
                     p_body);
-
-            i_meat_heap_count ++;
         }
         else
         {
+#if defined(MEAT_CFG_DBG)
             meat_dbg_break(
                 p_ctxt,
                 p_ctxt->p_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
 
             p_buf =
                 0;
         }
+#else /* #if defined(MEAT_CFG_LEAK) */
+        (void)(
+            p_ctxt);
+
+        p_buf =
+            malloc(
+                i_buf_len);
+#endif /* #if defined(MEAT_CFG_LEAK) */
     }
     else
     {
+#if defined(MEAT_CFG_DBG)
         meat_dbg_break(
             p_ctxt,
             p_ctxt->p_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
 
         p_buf =
             0;
@@ -272,6 +284,7 @@ meat_heap_free(
     if (
         p_heap->b_init)
     {
+#if defined(MEAT_CFG_LEAK)
         struct meat_heap_prefix *
             p_prefix;
 
@@ -312,9 +325,11 @@ meat_heap_free(
                         MEAT_HEAP_FOOTER_SIGNATURE
                         != p_suffix->a_footer[i]))
                 {
+#if defined(MEAT_CFG_DBG)
                     meat_dbg_break(
                         p_ctxt,
                         p_ctxt->p_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
 
                     break;
                 }
@@ -334,14 +349,18 @@ meat_heap_free(
 
         free(
             p_prefix);
-
-        i_meat_heap_count --;
+#else /* #if defined(MEAT_CFG_LEAK) */
+        free(
+            p_buf);
+#endif /* #if defined(MEAT_CFG_LEAK) */
     }
     else
     {
+#if defined(MEAT_CFG_DBG)
         meat_dbg_break(
             p_ctxt,
             p_ctxt->p_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
     }
 
 } /* meat_heap_free() */
@@ -392,6 +411,7 @@ meat_heap_cleanup(
     if (
         p_heap->b_init)
     {
+#if defined(MEAT_CFG_LEAK)
         if (o_meat_heap_list.p_next != &o_meat_heap_list)
         {
             struct meat_list *
@@ -422,12 +442,15 @@ meat_heap_cleanup(
                     p_iterator->p_next;
             }
 
+#if defined(MEAT_CFG_DBG)
             meat_dbg_break(
                 p_ctxt,
                 p_ctxt->p_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
         }
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
-        b_meat_heap_init_done =
+        p_heap->b_init =
             0;
     }
 

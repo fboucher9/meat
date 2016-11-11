@@ -15,6 +15,16 @@ Description:
 #error include meat_os.h first
 #endif /* #if !defined(INC_MEAT_OS_H) */
 
+#if !defined(INC_MEAT_CFG_H)
+#error include meat_cfg.h before
+#endif /* #if !defined(INC_MEAT_CFG_H) */
+
+/* Validate configuration */
+#if !defined(MEAT_CFG_LEAK)
+#error feature is disabled
+#endif /* #if !defined(MEAT_CFG_LEAK) */
+
+/* Reverse include guard */
 #if defined(INC_MEAT_TRACE_H)
 #error include meat_trace.h once
 #endif /* #if defined(INC_MEAT_TRACE_H) */

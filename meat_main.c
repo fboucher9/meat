@@ -12,6 +12,8 @@ Description:
 
 #include "meat_os.h"
 
+#include "meat_cfg.h"
+
 #include "meat_main.h"
 
 #include "meat_list.h"
@@ -20,7 +22,9 @@ Description:
 
 #include "meat_heap.h"
 
+#if defined(MEAT_CFG_LEAK)
 #include "meat_trace.h"
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
 #include "meat_opts.h"
 
@@ -28,7 +32,9 @@ Description:
 
 #include "meat_file.h"
 
+#if defined(MEAT_CFG_DBG)
 #include "meat_dbg.h"
+#endif /* #if defined(MEAT_CFG_DBG) */
 
 #include "meat_ctxt.h"
 
@@ -74,11 +80,15 @@ struct meat_main_impl
     struct meat_ctxt
         o_ctxt;
 
+#if defined(MEAT_CFG_DBG)
     struct meat_dbg
         o_dbg;
+#endif /* #if defined(MEAT_CFG_DBG) */
 
+#if defined(MEAT_CFG_LEAK)
     struct meat_trace
         o_trace;
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
     struct meat_heap
         o_heap;
@@ -95,8 +105,30 @@ struct meat_main_impl
     struct meat_game_list
         o_game_list;
 
+#if defined(MEAT_CFG_DBG)
+    char
+        b_dbg;
+#endif /* #if defined(MEAT_CFG_DBG) */
+
+#if defined(MEAT_CFG_LEAK)
+    char
+        b_trace;
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
+    char
+        b_heap;
+
+    char
+        b_opts;
+
+    char
+        b_output;
+
     char
         b_input;
+
+    char
+        b_games;
 
 }; /* struct meat_main_impl */
 
@@ -301,36 +333,78 @@ char
     struct meat_ctxt *
         p_ctxt;
 
+#if defined(MEAT_CFG_DBG)
+    p_main->b_dbg =
+        0;
+#endif /* #if defined(MEAT_CFG_DBG) */
+
+#if defined(MEAT_CFG_LEAK)
+    p_main->b_trace =
+        0;
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
+    p_main->b_heap =
+        0;
+
+    p_main->b_opts =
+        0;
+
+    p_main->b_output =
+        0;
+
+    p_main->b_input =
+        0;
+
+    p_main->b_games =
+        0;
+
     p_ctxt =
         &(
             p_main->o_ctxt);
 
+#if defined(MEAT_CFG_DBG)
     p_ctxt->p_dbg =
         &(
             p_main->o_dbg);
+#endif /* #if defined(MEAT_CFG_DBG) */
 
+#if defined(MEAT_CFG_LEAK)
     p_ctxt->p_trace =
         &(
             p_main->o_trace);
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
     p_ctxt->p_heap =
         &(
             p_main->o_heap);
 
+#if defined(MEAT_CFG_DBG)
     meat_dbg_init(
         p_ctxt,
         &(
             p_main->o_dbg));
 
+    p_main->b_dbg =
+        1;
+#endif /* #if defined(MEAT_CFG_DBG) */
+
+#if defined(MEAT_CFG_LEAK)
     meat_trace_init(
         p_ctxt,
         &(
             p_main->o_trace));
 
+    p_main->b_trace =
+        1;
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
     meat_heap_init(
         p_ctxt,
         &(
             p_main->o_heap));
+
+    p_main->b_heap =
+        1;
 
     meat_file_init(
         p_ctxt,
@@ -339,11 +413,17 @@ char
         meat_file_type_stdout,
         NULL);
 
+    p_main->b_output =
+        1;
+
     meat_opts_init(
         &(
             p_main->o_opts),
         argc,
         argv);
+
+    p_main->b_opts =
+        1;
 
     if (
         p_main->o_opts.i_end
@@ -370,6 +450,9 @@ char
                     &(
                         p_main->o_file_in)))
             {
+                p_main->b_games =
+                    1;
+
                 meat_file_cleanup(
                     p_ctxt,
                     &(
@@ -389,6 +472,9 @@ char
                         p_ctxt,
                         &(
                             p_main->o_game_list));
+
+                    p_main->b_games =
+                        0;
                 }
 #endif /* not used */
             }
@@ -435,29 +521,68 @@ char
     if (
         !b_result)
     {
-        meat_opts_cleanup(
-            &(
-                p_main->o_opts));
+        if (
+            p_main->b_opts)
+        {
+            meat_opts_cleanup(
+                &(
+                    p_main->o_opts));
 
-        meat_file_cleanup(
-            p_ctxt,
-            &(
-                p_main->o_file_out));
+            p_main->b_opts =
+                0;
+        }
 
-        meat_heap_cleanup(
-            p_ctxt,
-            &(
-                p_main->o_heap));
+        if (
+            p_main->b_output)
+        {
+            meat_file_cleanup(
+                p_ctxt,
+                &(
+                    p_main->o_file_out));
 
-        meat_trace_cleanup(
-            p_ctxt,
-            &(
-                p_main->o_trace));
+            p_main->b_output =
+                0;
+        }
 
-        meat_dbg_cleanup(
-            p_ctxt,
-            &(
-                p_main->o_dbg));
+        if (
+            p_main->b_heap)
+        {
+            meat_heap_cleanup(
+                p_ctxt,
+                &(
+                    p_main->o_heap));
+
+            p_main->b_heap =
+                0;
+        }
+
+#if defined(MEAT_CFG_LEAK)
+        if (
+            p_main->b_trace)
+        {
+            meat_trace_cleanup(
+                p_ctxt,
+                &(
+                    p_main->o_trace));
+
+            p_main->b_trace =
+                0;
+        }
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
+#if defined(MEAT_CFG_DBG)
+        if (
+            p_main->b_dbg)
+        {
+            meat_dbg_cleanup(
+                p_ctxt,
+                &(
+                    p_main->o_dbg));
+
+            p_main->b_dbg =
+                0;
+        }
+#endif /* #if defined(MEAT_CFG_DBG) */
     }
 
     return
@@ -478,10 +603,17 @@ void
         &(
             p_main->o_ctxt);
 
-    meat_game_list_cleanup(
-        p_ctxt,
-        &(
-            p_main->o_game_list));
+    if (
+        p_main->b_games)
+    {
+        meat_game_list_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_game_list));
+
+        p_main->b_games =
+            0;
+    }
 
     if (
         p_main->b_input)
@@ -495,29 +627,68 @@ void
             0;
     }
 
-    meat_file_cleanup(
-        p_ctxt,
-        &(
-            p_main->o_file_out));
+    if (
+        p_main->b_output)
+    {
+        meat_file_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_file_out));
 
-    meat_opts_cleanup(
-        &(
-            p_main->o_opts));
+        p_main->b_output =
+            0;
+    }
 
-    meat_heap_cleanup(
-        p_ctxt,
-        &(
-            p_main->o_heap));
+    if (
+        p_main->b_opts)
+    {
+        meat_opts_cleanup(
+            &(
+                p_main->o_opts));
 
-    meat_trace_cleanup(
-        p_ctxt,
-        &(
-            p_main->o_trace));
+        p_main->b_opts =
+            0;
+    }
 
-    meat_dbg_cleanup(
-        p_ctxt,
-        &(
-            p_main->o_dbg));
+    if (
+        p_main->b_heap)
+    {
+        meat_heap_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_heap));
+
+        p_main->b_heap =
+            0;
+    }
+
+#if defined(MEAT_CFG_LEAK)
+    if (
+        p_main->b_trace)
+    {
+        meat_trace_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_trace));
+
+        p_main->b_trace =
+            0;
+    }
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
+#if defined(MEAT_CFG_DBG)
+    if (
+        p_main->b_dbg)
+    {
+        meat_dbg_cleanup(
+            p_ctxt,
+            &(
+                p_main->o_dbg));
+
+        p_main->b_dbg =
+            0;
+    }
+#endif /* #if defined(MEAT_CFG_DBG) */
 
 } /* meat_main_impl_cleanup() */
 

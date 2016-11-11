@@ -12,6 +12,10 @@ Description:
 
 #include "meat_os.h"
 
+#include "meat_cfg.h"
+
+#if defined(MEAT_CFG_LEAK)
+
 #include "meat_trace.h"
 
 #if !defined(__CYGWIN__)
@@ -218,5 +222,7 @@ meat_trace_report(
     }
 
 } /* meat_trace_report() */
+
+#endif /* #if defined(MEAT_CFG_LEAK) */
 
 /* end-of-file: meat_trace.c */
