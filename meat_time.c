@@ -15,6 +15,9 @@ Description:
 /* For mktime, localtime, ctime, ... */
 #include <time.h>
 
+/* For strlen, strcmp, memcpy */
+#include <string.h>
+
 signed long int
     meat_time_offset_minutes(
         int const i_minutes)

@@ -20,6 +20,9 @@ Description:
 
 #if !defined(__CYGWIN__)
 
+/* For fprintf */
+#include <stdio.h>
+
 /* For backtrace() */
 #include <execinfo.h>
 

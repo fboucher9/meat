@@ -16,6 +16,12 @@ Description:
 
 #include "meat_time.h"
 
+/* For strcmp */
+#include <string.h>
+
+/* For sscanf */
+#include <stdio.h>
+
 /*
 
 Function: meat_opts_init

@@ -96,11 +96,11 @@ struct meat_main_impl
     struct meat_opts
         o_opts;
 
-    struct meat_file
-        o_file_out;
+    struct meat_file *
+        p_file_out;
 
-    struct meat_file
-        o_file_in;
+    struct meat_file *
+        p_file_in;
 
     struct meat_game_list
         o_game_list;
@@ -120,12 +120,6 @@ struct meat_main_impl
 
     char
         b_opts;
-
-    char
-        b_output;
-
-    char
-        b_input;
 
     char
         b_games;
@@ -153,8 +147,7 @@ void
 
     struct meat_file * const
         p_file_out =
-        &(
-            p_main->o_file_out);
+        p_main->p_file_out;
 
     if (
         (
@@ -240,32 +233,27 @@ meat_main_impl_show_range(
 
     print_string(
         p_ctxt,
-        &(
-            p_main->o_file_out),
+        p_main->p_file_out,
         "Range from ");
 
     print_string(
         p_ctxt,
-        &(
-            p_main->o_file_out),
+        p_main->p_file_out,
         ac_range_begin);
 
     print_string(
         p_ctxt,
-        &(
-            p_main->o_file_out),
+        p_main->p_file_out,
         " to ");
 
     print_string(
         p_ctxt,
-        &(
-            p_main->o_file_out),
+        p_main->p_file_out,
         ac_range_end);
 
     print_string(
         p_ctxt,
-        &(
-            p_main->o_file_out),
+        p_main->p_file_out,
         "\n");
 
 } /* meat_main_impl_show_range() */
@@ -349,10 +337,10 @@ char
     p_main->b_opts =
         0;
 
-    p_main->b_output =
+    p_main->p_file_in =
         0;
 
-    p_main->b_input =
+    p_main->p_file_out =
         0;
 
     p_main->b_games =
@@ -406,15 +394,11 @@ char
     p_main->b_heap =
         1;
 
-    meat_file_init(
-        p_ctxt,
-        &(
-            p_main->o_file_out),
-        meat_file_type_stdout,
-        NULL);
-
-    p_main->b_output =
-        1;
+    p_main->p_file_out =
+        meat_file_create(
+            p_ctxt,
+            meat_file_type_stdout,
+            NULL);
 
     meat_opts_init(
         &(
@@ -431,34 +415,30 @@ char
     {
         p_main->o_opts.i_end -= 10;
 
-        p_main->b_input =
-            meat_file_init(
+        p_main->p_file_in =
+            meat_file_create(
                 p_ctxt,
-                &(
-                    p_main->o_file_in),
                 meat_file_type_stdin,
                 NULL);
 
         if (
-            p_main->b_input)
+            p_main->p_file_in)
         {
             if (
                 meat_game_list_init(
                     p_ctxt,
                     &(
                         p_main->o_game_list),
-                    &(
-                        p_main->o_file_in)))
+                    p_main->p_file_in))
             {
                 p_main->b_games =
                     1;
 
-                meat_file_cleanup(
+                meat_file_destroy(
                     p_ctxt,
-                    &(
-                        p_main->o_file_in));
+                    p_main->p_file_in);
 
-                p_main->b_input =
+                p_main->p_file_in =
                     0;
 
                 b_result =
@@ -488,14 +468,13 @@ char
                 !b_result)
             {
                 if (
-                    p_main->b_input)
+                    p_main->p_file_in)
                 {
-                    meat_file_cleanup(
+                    meat_file_destroy(
                         p_ctxt,
-                        &(
-                            p_main->o_file_in));
+                        p_main->p_file_in);
 
-                    p_main->b_input =
+                    p_main->p_file_in =
                         0;
                 }
             }
@@ -510,8 +489,7 @@ char
     {
         print_string(
             p_ctxt,
-            &(
-                p_main->o_file_out),
+            p_main->p_file_out,
             "wha?\n");
 
         b_result =
@@ -533,15 +511,15 @@ char
         }
 
         if (
-            p_main->b_output)
+            p_main->p_file_out)
         {
-            meat_file_cleanup(
+            meat_file_destroy(
                 p_ctxt,
-                &(
-                    p_main->o_file_out));
+                p_main->p_file_out);
 
-            p_main->b_output =
-                0;
+            p_main->p_file_out =
+                (struct meat_file *)(
+                    0);
         }
 
         if (
@@ -616,27 +594,26 @@ void
     }
 
     if (
-        p_main->b_input)
+        p_main->p_file_in)
     {
-        meat_file_cleanup(
+        meat_file_destroy(
             p_ctxt,
-            &(
-                p_main->o_file_in));
+            p_main->p_file_in);
 
-        p_main->b_input =
+        p_main->p_file_in =
             0;
     }
 
     if (
-        p_main->b_output)
+        p_main->p_file_out)
     {
-        meat_file_cleanup(
+        meat_file_destroy(
             p_ctxt,
-            &(
-                p_main->o_file_out));
+            p_main->p_file_out);
 
-        p_main->b_output =
-            0;
+        p_main->p_file_out =
+            (struct meat_file *)(
+                0);
     }
 
     if (

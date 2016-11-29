@@ -12,129 +12,128 @@ Description:
 
 #include "meat_os.h"
 
+#include <stdio.h>
+
 #include "meat_file.h"
 
-char
-    meat_file_init(
+#include "meat_ctxt.h"
+
+#include "meat_heap.h"
+
+/*
+
+Structure: meat_file
+
+Description:
+
+*/
+struct meat_file
+{
+    FILE *
+        p_private;
+
+}; /* struct meat_file */
+
+struct meat_file *
+    meat_file_create(
         struct meat_ctxt * const
             p_ctxt,
-        struct meat_file * const
-            p_file,
         enum meat_file_type const
             e_type,
         char const * const
             p_name)
 {
-    char
-        b_result;
+    struct meat_file *
+        p_file;
 
-    (void)(
-        p_ctxt);
+    p_file =
+        (struct meat_file *)(
+            meat_heap_alloc(
+                p_ctxt,
+                p_ctxt->p_heap,
+                sizeof(
+                    struct meat_file)));
 
     if (
-        meat_file_type_stdin
-        == e_type)
+        p_file)
     {
-        p_file->p_private =
-            stdin;
-
-        b_result =
-            1;
-    }
-    else if (
-        meat_file_type_stdout
-        == e_type)
-    {
-        p_file->p_private =
-            stdout;
-
-        b_result =
-            1;
-    }
-    else if (
-        meat_file_type_readonly
-        == e_type)
-    {
-        p_file->p_private =
-            fopen(
-                p_name,
-                "r");
+        if (
+            meat_file_type_stdin
+            == e_type)
+        {
+            p_file->p_private =
+                stdin;
+        }
+        else if (
+            meat_file_type_stdout
+            == e_type)
+        {
+            p_file->p_private =
+                stdout;
+        }
+        else if (
+            meat_file_type_readonly
+            == e_type)
+        {
+            p_file->p_private =
+                fopen(
+                    p_name,
+                    "r");
+        }
+        else if (
+            meat_file_type_writeonly
+            == e_type)
+        {
+            p_file->p_private =
+                fopen(
+                    p_name,
+                    "w");
+        }
+        else if (
+            meat_file_type_append
+            == e_type)
+        {
+            p_file->p_private =
+                fopen(
+                    p_name,
+                    "a");
+        }
+        else
+        {
+            p_file->p_private =
+                NULL;
+        }
 
         if (
             p_file->p_private)
         {
-            b_result =
-                1;
         }
         else
         {
-            b_result =
-                0;
-        }
-    }
-    else if (
-        meat_file_type_writeonly
-        == e_type)
-    {
-        p_file->p_private =
-            fopen(
-                p_name,
-                "w");
+            meat_heap_free(
+                p_ctxt,
+                p_ctxt->p_heap,
+                (void *)(
+                    p_file));
 
-        if (
-            p_file->p_private)
-        {
-            b_result =
-                1;
+            p_file =
+                (struct meat_file *)(
+                    0);
         }
-        else
-        {
-            b_result =
-                0;
-        }
-    }
-    else if (
-        meat_file_type_append
-        == e_type)
-    {
-        p_file->p_private =
-            fopen(
-                p_name,
-                "a");
-
-        if (
-            p_file->p_private)
-        {
-            b_result =
-                1;
-        }
-        else
-        {
-            b_result =
-                0;
-        }
-    }
-    else
-    {
-        b_result =
-            0;
     }
 
     return
-        b_result;
+        p_file;
 
-} /* meat_file_init() */
+} /* meat_file_create() */
 
 void
-    meat_file_cleanup(
+    meat_file_destroy(
         struct meat_ctxt * const
             p_ctxt,
         struct meat_file * const
             p_file)
 {
-    (void)(
-        p_ctxt);
-
     if (
         p_file->p_private)
     {
@@ -152,7 +151,13 @@ void
         p_file->p_private = NULL;
     }
 
-} /* meat_file_cleanup() */
+    meat_heap_free(
+        p_ctxt,
+        p_ctxt->p_heap,
+        (void *)(
+            p_file));
+
+} /* meat_file_destroy() */
 
 int
     meat_file_read_char(

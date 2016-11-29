@@ -48,29 +48,15 @@ enum meat_file_type
 
 }; /* enum meat_file_type */
 
-/*
-
-Structure: meat_file
-
-Description:
-
-*/
-struct meat_file
-{
-    FILE *
-        p_private;
-
-}; /* struct meat_file */
+struct meat_file;
 
 #if defined(__cplusplus)
 extern "C"
 #endif /* #if defined(__cplusplus) */
-char
-meat_file_init(
+struct meat_file *
+meat_file_create(
     struct meat_ctxt * const
         p_ctxt,
-    struct meat_file * const
-        p_file,
     enum meat_file_type const
         e_type,
     char const * const
@@ -80,7 +66,7 @@ meat_file_init(
 extern "C"
 #endif /* #if defined(__cplusplus) */
 void
-meat_file_cleanup(
+meat_file_destroy(
     struct meat_ctxt * const
         p_ctxt,
     struct meat_file * const

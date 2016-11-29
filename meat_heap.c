@@ -30,6 +30,11 @@ Description:
 #include <stdlib.h>
 
 #if defined(MEAT_CFG_LEAK)
+/* For printf */
+#include <stdio.h>
+#endif /* #if defined(MEAT_CFG_LEAK) */
+
+#if defined(MEAT_CFG_LEAK)
 
 static
 struct meat_list
@@ -94,6 +99,32 @@ struct meat_heap_suffix
 
 }; /* struct meat_heap_suffix */
 
+static
+void
+fill_char_array(
+    unsigned char * const
+        p_char_array,
+    unsigned char const
+        i_fill_value,
+    size_t
+        i_char_array_len)
+{
+    size_t
+        i_array_iterator;
+
+    for (
+        i_array_iterator =
+            0u;
+        (
+            i_array_iterator
+            < i_char_array_len);
+        i_array_iterator ++)
+    {
+        p_char_array[i_array_iterator] = i_fill_value;
+    }
+
+} /* fill_char_array() */
+
 #endif /* #if defined(MEAT_CFG_LEAK) */
 
 /*
@@ -139,33 +170,19 @@ meat_heap_alloc(
         struct meat_heap_prefix *
             p_prefix;
 
-        char *
+        unsigned char *
             p_body;
 
         struct meat_heap_suffix *
             p_suffix;
 
         size_t
-            i_buf_len_aligned;
-
-        size_t
             i_total_len;
-
-        i_buf_len_aligned =
-            (size_t)(
-                (
-                    i_buf_len
-                    + 7ul)
-                - (
-                    (
-                        i_buf_len
-                        + 7ul)
-                    & 7ul));
 
         i_total_len =
             (size_t)(
                 sizeof(struct meat_heap_prefix)
-                + i_buf_len_aligned
+                + i_buf_len
                 + sizeof(struct meat_heap_suffix));
 
         p_prefix =
@@ -187,27 +204,28 @@ meat_heap_alloc(
                 5u);
 
             p_prefix->i_buf_len =
-                i_buf_len_aligned;
+                i_buf_len;
 
-            memset(
+            fill_char_array(
                 p_prefix->a_header,
                 MEAT_HEAP_HEADER_SIGNATURE,
                 sizeof(p_prefix->a_header));
 
             p_body =
-                (char *)(
+                (unsigned char *)(
                     p_prefix + 1);
 
-            memset(
+            fill_char_array(
                 p_body,
                 MEAT_HEAP_BODY_CREATED,
-                p_prefix->i_buf_len);
+                (size_t)(
+                    p_prefix->i_buf_len));
 
             p_suffix =
                 (struct meat_heap_suffix *)(
                     p_body + p_prefix->i_buf_len);
 
-            memset(
+            fill_char_array(
                 p_suffix->a_footer,
                 MEAT_HEAP_FOOTER_SIGNATURE,
                 sizeof(p_suffix->a_footer));
@@ -288,7 +306,7 @@ meat_heap_free(
         struct meat_heap_prefix *
             p_prefix;
 
-        char *
+        unsigned char *
             p_body;
 
         struct meat_heap_suffix *
@@ -300,7 +318,7 @@ meat_heap_free(
             - 1;
 
         p_body =
-            (char *)(
+            (unsigned char *)(
                 p_buf);
 
         p_suffix =
@@ -336,7 +354,7 @@ meat_heap_free(
             }
         }
 
-        memset(
+        fill_char_array(
             p_body,
             MEAT_HEAP_BODY_DESTROYED,
             p_prefix->i_buf_len);
@@ -436,7 +454,11 @@ meat_heap_cleanup(
                     p_ctxt,
                     p_ctxt->p_trace,
                     p_prefix->a_stack,
-                    5);
+                    (unsigned int)(
+                        sizeof(
+                            p_prefix->a_stack)
+                        / sizeof(
+                            p_prefix->a_stack[0u])));
 
                 p_iterator =
                     p_iterator->p_next;
