@@ -26,6 +26,8 @@ Description:
 
 #include "meat_ctxt.h"
 
+#include "meat_string.h"
+
 struct line_info
 {
     unsigned char *
@@ -35,153 +37,6 @@ struct line_info
         i_buf_len;
 
 }; /* struct line_info */
-
-static
-char
-is_whitespace(
-    unsigned char const
-        c_buf)
-{
-    return
-        (char)(
-            (
-                (unsigned char)(' ')
-                == c_buf)
-            || (
-                (unsigned char)('\r')
-                == c_buf)
-            || (
-                (unsigned char)('\t')
-                == c_buf)
-            || (
-                (unsigned char)('\n')
-                == c_buf));
-
-}
-
-static
-size_t
-    skip_whitespace(
-        struct line_info const * const
-            p_info,
-        size_t const
-            i_start_offset)
-{
-    size_t
-        i_offset;
-
-    i_offset =
-        i_start_offset;
-
-    while (
-        (
-            i_offset
-            < p_info->i_buf_len)
-        &&
-            is_whitespace(
-                p_info->p_buf[i_offset]))
-    {
-        i_offset ++;
-    }
-
-    return
-        i_offset;
-
-}
-
-static
-size_t
-    find_whitespace(
-        struct line_info const * const
-            p_info,
-        size_t const
-            i_start_offset)
-{
-    size_t
-        i_offset;
-
-    i_offset =
-        i_start_offset;
-
-    while (
-        (
-            i_offset
-            < p_info->i_buf_len)
-        &&
-            !(
-                is_whitespace(
-                    p_info->p_buf[i_offset])))
-    {
-        i_offset ++;
-    }
-
-    return
-        i_offset;
-
-}
-
-static
-char
-    is_digit(
-        unsigned char const
-            c_buf)
-{
-    return
-        (char)(
-            (
-                (unsigned char)('0')
-                <= c_buf)
-            && (
-                (unsigned char)('9')
-                >= c_buf));
-
-}
-
-static
-signed long int
-    scan_decimal(
-        unsigned char const * const
-            p_buf,
-        size_t const
-            i_buf_len)
-{
-    signed long int
-        i_value;
-
-    size_t
-        i_offset;
-
-    i_value =
-        0l;
-
-    i_offset =
-        0;
-
-    while (
-        i_offset
-        < i_buf_len)
-    {
-        if (
-            is_digit(
-                p_buf[i_offset]))
-        {
-            i_value =
-                (signed long int)(
-                    (
-                        i_value
-                        * 10l)
-                    + (signed long int)(
-                        p_buf[i_offset]
-                        - '0'));
-        }
-
-        i_offset ++;
-    }
-
-    return
-        i_value;
-
-}
 
 static
 char
@@ -219,6 +74,8 @@ char
 
         p_game->i_game_time = 0;
 
+        p_game->i_remarks_len = 0u;
+
         p_game->a_remarks[0u] = '\000';
 
         {
@@ -228,88 +85,95 @@ char
             size_t
                 i_offset;
 
-            size_t
-                i_remarks_iterator;
-
             i_offset_end =
                 0;
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
-                find_whitespace(
-                    p_line_info,
+                meat_string_find_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset);
 
             o_game_time.i_year =
-                scan_decimal(
+                meat_string_scan_decimal(
                     p_line_info->p_buf + i_offset,
                     (size_t)(
                         i_offset_end - i_offset));
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
-                find_whitespace(
-                    p_line_info,
+                meat_string_find_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset);
 
             o_game_time.i_month =
-                scan_decimal(
+                meat_string_scan_decimal(
                     p_line_info->p_buf + i_offset,
                     (size_t)(
                         i_offset_end - i_offset));
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
-                find_whitespace(
-                    p_line_info,
+                meat_string_find_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset);
 
             o_game_time.i_day_of_month =
-                scan_decimal(
+                meat_string_scan_decimal(
                     p_line_info->p_buf + i_offset,
                     (size_t)(
                         i_offset_end - i_offset));
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
-                find_whitespace(
-                    p_line_info,
+                meat_string_find_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset);
 
             o_game_time.i_hour =
-                scan_decimal(
+                meat_string_scan_decimal(
                     p_line_info->p_buf + i_offset,
                     (size_t)(
                         i_offset_end - i_offset));
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
-                find_whitespace(
-                    p_line_info,
+                meat_string_find_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset);
 
             o_game_time.i_minute =
-                scan_decimal(
+                meat_string_scan_decimal(
                     p_line_info->p_buf + i_offset,
                     (size_t)(
                         i_offset_end - i_offset));
@@ -343,8 +207,9 @@ char
                         o_game_time));
 
             i_offset =
-                skip_whitespace(
-                    p_line_info,
+                meat_string_skip_whitespace(
+                    p_line_info->p_buf,
+                    p_line_info->i_buf_len,
                     i_offset_end);
 
             i_offset_end =
@@ -362,25 +227,20 @@ char
                 i_offset_end --;
             }
 
-            i_remarks_iterator =
-                0;
-
             while (
                 i_offset < i_offset_end)
             {
                 if (
-                    i_remarks_iterator < (sizeof(p_game->a_remarks) - 1))
+                    p_game->i_remarks_len < sizeof(p_game->a_remarks))
                 {
-                    p_game->a_remarks[i_remarks_iterator] =
+                    p_game->a_remarks[p_game->i_remarks_len] =
                         p_line_info->p_buf[i_offset];
 
-                    i_remarks_iterator ++;
+                    p_game->i_remarks_len ++;
                 }
 
                 i_offset ++;
             }
-
-            p_game->a_remarks[i_remarks_iterator] = '\000';
         }
 
         meat_list_join(

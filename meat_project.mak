@@ -33,7 +33,8 @@ MEAT_SRCS := \
     $(MEAT_DST_PATH)/_obj_meat_game.o \
     $(MEAT_DST_PATH)/_obj_meat_file.o \
     $(MEAT_DST_PATH)/_obj_meat_trace.o \
-    $(MEAT_DST_PATH)/_obj_meat_chunk.o
+    $(MEAT_DST_PATH)/_obj_meat_chunk.o \
+    $(MEAT_DST_PATH)/_obj_meat_string.o
 
 .PHONY: all
 all: $(MEAT_DST_PATH)/meat

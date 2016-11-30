@@ -16,11 +16,10 @@ Description:
 
 #include "meat_time.h"
 
+#include "meat_string.h"
+
 /* For strcmp */
 #include <string.h>
-
-/* For sscanf */
-#include <stdio.h>
 
 /*
 
@@ -182,8 +181,13 @@ void
                 }
                 else if (('0' <= p_argv[2][0]) && ('9' >= p_argv[2][0]))
                 {
-                    i_count = 1;
-                    sscanf(p_argv[2], "%d", &i_count);
+                    i_count =
+                        meat_string_scan_decimal(
+                            (unsigned char *)(
+                                p_argv[2u]),
+                            (size_t)(
+                                strlen(
+                                    p_argv[2u])));
                     if (i_argc > 3)
                     {
                         if ((i_count > 1) && (0 == strcmp(p_argv[3], "days")))
@@ -262,8 +266,13 @@ void
                 }
                 else if (('0' <= p_argv[2][0]) && ('9' >= p_argv[2][0]))
                 {
-                    i_count = 1;
-                    sscanf(p_argv[2], "%d", &i_count);
+                    i_count =
+                        meat_string_scan_decimal(
+                            (unsigned char const *)(
+                                p_argv[2u]),
+                            (size_t)(
+                                strlen(
+                                    p_argv[2])));
                     if (i_argc > 3)
                     {
                         if (i_count > 1)
@@ -300,8 +309,13 @@ void
         else if (('0' <= p_argv[1][0]) && ('9' >= p_argv[1][0]))
         {
             /* */
-            i_count = 1;
-            sscanf(p_argv[1], "%d", &i_count);
+            i_count =
+                meat_string_scan_decimal(
+                    (unsigned char const *)(
+                        p_argv[1u]),
+                    (size_t)(
+                        strlen(
+                            p_argv[1u])));
             if (i_argc > 3)
             {
                 if (0 == strcmp(p_argv[3], "ago"))
@@ -354,8 +368,13 @@ void
             {
                 if (('0' <= p_argv[2][0]) && ('9' >= p_argv[2][0]))
                 {
-                    i_count = 1;
-                    sscanf(p_argv[2], "%d", &i_count);
+                    i_count =
+                        meat_string_scan_decimal(
+                            (unsigned char const *)(
+                                p_argv[2u]),
+                            (size_t)(
+                                strlen(
+                                    p_argv[2u])));
                     if (i_argc > 3)
                     {
                         if (

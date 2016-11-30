@@ -17,15 +17,4 @@ Description:
 /* For size_t */
 #include <stddef.h>
 
-/* For printf, ... */
-#if 0
-#include <stdio.h>
-#endif
-
-/* For strcmp */
-#if 0
-#include <string.h>
-#endif
-
-
 /* end-of-file: meat_os.h */

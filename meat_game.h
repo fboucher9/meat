@@ -52,6 +52,9 @@ struct meat_game
     signed long int
         i_game_time;
 
+    size_t
+        i_remarks_len;
+
     char
         a_remarks[256u];
 

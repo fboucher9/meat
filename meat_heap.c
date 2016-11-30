@@ -29,8 +29,8 @@ Description:
 /* For malloc and free, ... */
 #include <stdlib.h>
 
-#if defined(MEAT_CFG_LEAK)
 /* For printf */
+#if defined(MEAT_CFG_LEAK)
 #include <stdio.h>
 #endif /* #if defined(MEAT_CFG_LEAK) */
 

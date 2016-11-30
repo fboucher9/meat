@@ -46,25 +46,26 @@ print_string(
     struct meat_file * const
         p_file,
     char const * const
-        a_msg)
+        a_msg,
+    size_t const
+        i_msg_len)
 {
-    char const *
-        p_msg;
+    size_t
+        i_offset;
 
-    p_msg =
-        a_msg;
+    i_offset =
+        0;
 
     while (
-        *(
-            p_msg))
+        i_offset
+        < i_msg_len)
     {
         meat_file_write_char(
             p_ctxt,
             p_file,
-            *(
-                p_msg));
+            a_msg[i_offset]);
 
-        p_msg ++;
+        i_offset ++;
     }
 }
 
@@ -172,7 +173,8 @@ void
         print_string(
             p_ctxt,
             p_file_out,
-            ac_game_time);
+            ac_game_time,
+            i_date_len);
 
         {
             while (
@@ -191,7 +193,8 @@ void
         print_string(
             p_ctxt,
             p_file_out,
-            p_game->a_remarks);
+            p_game->a_remarks,
+            p_game->i_remarks_len);
 
         meat_file_write_char(
             p_ctxt,
@@ -217,44 +220,91 @@ meat_main_impl_show_range(
     char
         ac_range_end[64u];
 
+    int
+        i_range_begin_len;
+
+    int
+        i_range_end_len;
+
     p_ctxt =
         &(
             p_main->o_ctxt);
 
-    meat_time_format_stamp(
-        p_main->o_opts.i_begin,
+    i_range_begin_len =
+        meat_time_format_stamp(
+            p_main->o_opts.i_begin,
+            ac_range_begin,
+            sizeof(ac_range_begin));
+
+    i_range_end_len =
+        meat_time_format_stamp(
+            p_main->o_opts.i_end,
+            ac_range_end,
+            sizeof(ac_range_end));
+
+    {
+        static char const a_msg[] =
+        {
+            'R',
+            'a',
+            'n',
+            'g',
+            'e',
+            ' ',
+            'f',
+            'r',
+            'o',
+            'm',
+            ' '
+        };
+
+        print_string(
+            p_ctxt,
+            p_main->p_file_out,
+            a_msg,
+            sizeof(a_msg));
+    }
+
+    print_string(
+        p_ctxt,
+        p_main->p_file_out,
         ac_range_begin,
-        sizeof(ac_range_begin));
+        i_range_begin_len);
 
-    meat_time_format_stamp(
-        p_main->o_opts.i_end,
+    {
+        static char const a_msg[] =
+        {
+            ' ',
+            't',
+            'o',
+            ' '
+        };
+
+        print_string(
+            p_ctxt,
+            p_main->p_file_out,
+            a_msg,
+            sizeof(a_msg));
+    }
+
+    print_string(
+        p_ctxt,
+        p_main->p_file_out,
         ac_range_end,
-        sizeof(ac_range_end));
+        i_range_end_len);
 
-    print_string(
-        p_ctxt,
-        p_main->p_file_out,
-        "Range from ");
+    {
+        static char const a_msg[] =
+        {
+            '\n'
+        };
 
-    print_string(
-        p_ctxt,
-        p_main->p_file_out,
-        ac_range_begin);
-
-    print_string(
-        p_ctxt,
-        p_main->p_file_out,
-        " to ");
-
-    print_string(
-        p_ctxt,
-        p_main->p_file_out,
-        ac_range_end);
-
-    print_string(
-        p_ctxt,
-        p_main->p_file_out,
-        "\n");
+        print_string(
+            p_ctxt,
+            p_main->p_file_out,
+            a_msg,
+            sizeof(a_msg));
+    }
 
 } /* meat_main_impl_show_range() */
 
@@ -487,10 +537,20 @@ char
     }
     else
     {
+        static char const a_msg[] =
+        {
+            'w',
+            'h',
+            'a',
+            '?',
+            '\n'
+        };
+
         print_string(
             p_ctxt,
             p_main->p_file_out,
-            "wha?\n");
+            a_msg,
+            sizeof(a_msg));
 
         b_result =
             0;

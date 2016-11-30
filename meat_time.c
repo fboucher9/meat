@@ -15,9 +15,6 @@ Description:
 /* For mktime, localtime, ctime, ... */
 #include <time.h>
 
-/* For strlen, strcmp, memcpy */
-#include <string.h>
-
 signed long int
     meat_time_offset_minutes(
         int const i_minutes)
@@ -438,42 +435,26 @@ meat_time_format_stamp(
         p_buf)
     {
         i_text_len =
-            (unsigned int)(
-                strlen(
-                    p_buf));
+            0;
 
-        if (
-            i_text_len > i_text_max_len)
-        {
-            i_text_len =
-                i_text_max_len
-                - 1;
-        }
-
-        if (
+        while (
             (
-                i_text_len
-                > 0)
+                (i_text_len + 1)
+                < i_text_max_len)
             && (
                 '\n'
-                == p_buf[i_text_len - 1]))
+                != p_buf[i_text_len]))
         {
-            i_text_len --;
+            p_text[i_text_len] =
+                p_buf[i_text_len];
+
+            i_text_len ++;
         }
-
-        memcpy(
-            p_text,
-            p_buf,
-            i_text_len);
-
-        p_text[i_text_len] =
-            '\000';
     }
     else
     {
-        p_text[0] = '\000';
-
-        i_text_len = 0;
+        i_text_len =
+            0u;
     }
 
     return
@@ -486,20 +467,20 @@ meat_time_which_month(
     char const * const
         p_arg)
 {
-    static char const * const a_ref_month[12] =
+    static char const a_ref_month[12u][3u] =
     {
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec"
+        { 'j', 'a', 'n' },
+        { 'f', 'e', 'b' },
+        { 'm', 'a', 'r' },
+        { 'a', 'p', 'r' },
+        { 'm', 'a', 'y' },
+        { 'j', 'u', 'n' },
+        { 'j', 'u', 'l' },
+        { 'a', 'u', 'g' },
+        { 's', 'e', 'p' },
+        { 'o', 'c', 't' },
+        { 'n', 'o', 'v' },
+        { 'd', 'e', 'c' }
     };
 
     int
@@ -517,7 +498,13 @@ meat_time_which_month(
     while (
         !b_found && (i_month < 12))
     {
-        if (0 == strcmp(p_arg, a_ref_month[i_month]))
+        if (
+            (
+                p_arg[0u] == a_ref_month[i_month][0u])
+            && (
+                p_arg[1u] == a_ref_month[i_month][1u])
+            && (
+                p_arg[2u] == a_ref_month[i_month][2u]))
         {
             b_found = 1;
         }
@@ -544,15 +531,15 @@ meat_time_which_day_of_week(
     char const * const
         p_arg)
 {
-    static char const * const a_ref_wday[7] =
+    static char const a_ref_wday[7u][3u] =
     {
-        "sun",
-        "mon",
-        "tue",
-        "wed",
-        "thu",
-        "fri",
-        "sat"
+        { 's', 'u', 'n' },
+        { 'm', 'o', 'n' },
+        { 't', 'u', 'e' },
+        { 'w', 'e', 'd' },
+        { 't', 'h', 'u' },
+        { 'f', 'r', 'i' },
+        { 's', 'a', 't' }
     };
 
     int
@@ -574,10 +561,12 @@ meat_time_which_day_of_week(
             < 7))
     {
         if (
-            0
-            == strcmp(
-                p_arg,
-                a_ref_wday[i_wday]))
+            (
+                p_arg[0u] == a_ref_wday[i_wday][0u])
+            && (
+                p_arg[1u] == a_ref_wday[i_wday][1u])
+            && (
+                p_arg[2u] == a_ref_wday[i_wday][2u]))
         {
             b_found =
                 1;
