@@ -282,15 +282,19 @@ extern "C"
 #endif /* #if defined(__cplusplus) */
 int
     meat_time_which_month(
-        char const * const
-            p_arg);
+        unsigned char const * const
+            p_arg,
+        size_t const
+            i_arg_len);
 
 #if defined(__cplusplus)
 extern "C"
 #endif /* #if defined(__cplusplus) */
 int
     meat_time_which_day_of_week(
-        char const * const
-            p_arg);
+        unsigned char const * const
+            p_arg,
+        size_t const
+            i_arg_len);
 
 /* end-of-file: meat_time.h */

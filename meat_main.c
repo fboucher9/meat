@@ -454,7 +454,7 @@ char
         &(
             p_main->o_opts),
         argc,
-        argv);
+        (unsigned char const * const *)(argv));
 
     p_main->b_opts =
         1;

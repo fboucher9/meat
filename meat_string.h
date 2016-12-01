@@ -32,9 +32,17 @@ size_t
         unsigned char const * const
             p_buf,
         size_t const
-            i_buf_len,
+            i_buf_len);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+size_t
+    meat_string_trim_whitespace(
+        unsigned char const * const
+            p_buf,
         size_t const
-            i_start_offset);
+            i_buf_len);
 
 #if defined(__cplusplus)
 extern "C"
@@ -44,9 +52,17 @@ size_t
         unsigned char const * const
             p_buf,
         size_t const
-            i_buf_len,
+            i_buf_len);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+size_t
+    meat_string_find_null(
+        unsigned char const * const
+            p_buf,
         size_t const
-            i_start_offset);
+            i_buf_len);
 
 #if defined(__cplusplus)
 extern "C"
@@ -65,5 +81,19 @@ signed long int
             p_buf,
         size_t const
             i_buf_len);
+
+#if defined(__cplusplus)
+extern "C"
+#endif /* #if defined(__cplusplus) */
+signed int
+    meat_string_compare(
+        unsigned char const * const
+            p_buf_left,
+        size_t const
+            i_buf_left_len,
+        unsigned char const * const
+            p_buf_right,
+        size_t const
+            i_buf_right_len);
 
 /* end-of-file: meat_string.h */

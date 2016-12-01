@@ -464,8 +464,10 @@ meat_time_format_stamp(
 
 int
 meat_time_which_month(
-    char const * const
-        p_arg)
+    unsigned char const * const
+        p_arg,
+    size_t const
+        i_arg_len)
 {
     static char const a_ref_month[12u][3u] =
     {
@@ -495,22 +497,27 @@ meat_time_which_month(
     b_found =
         0;
 
-    while (
-        !b_found && (i_month < 12))
+    if (
+        3u
+        == i_arg_len)
     {
-        if (
-            (
-                p_arg[0u] == a_ref_month[i_month][0u])
-            && (
-                p_arg[1u] == a_ref_month[i_month][1u])
-            && (
-                p_arg[2u] == a_ref_month[i_month][2u]))
+        while (
+            !b_found && (i_month < 12))
         {
-            b_found = 1;
-        }
-        else
-        {
-            i_month ++;
+            if (
+                (
+                    p_arg[0u] == a_ref_month[i_month][0u])
+                && (
+                    p_arg[1u] == a_ref_month[i_month][1u])
+                && (
+                    p_arg[2u] == a_ref_month[i_month][2u]))
+            {
+                b_found = 1;
+            }
+            else
+            {
+                i_month ++;
+            }
         }
     }
 
@@ -528,10 +535,12 @@ meat_time_which_month(
 
 int
 meat_time_which_day_of_week(
-    char const * const
-        p_arg)
+    unsigned char const * const
+        p_arg,
+    size_t const
+        i_arg_len)
 {
-    static char const a_ref_wday[7u][3u] =
+    static unsigned char const a_ref_wday[7u][3u] =
     {
         { 's', 'u', 'n' },
         { 'm', 'o', 'n' },
@@ -554,26 +563,31 @@ meat_time_which_day_of_week(
     b_found =
         0;
 
-    while (
-        !b_found
-        && (
-            i_wday
-            < 7))
+    if (
+        3u
+        == i_arg_len)
     {
-        if (
-            (
-                p_arg[0u] == a_ref_wday[i_wday][0u])
+        while (
+            !b_found
             && (
-                p_arg[1u] == a_ref_wday[i_wday][1u])
-            && (
-                p_arg[2u] == a_ref_wday[i_wday][2u]))
+                i_wday
+                < 7))
         {
-            b_found =
-                1;
-        }
-        else
-        {
-            i_wday ++;
+            if (
+                (
+                    p_arg[0u] == a_ref_wday[i_wday][0u])
+                && (
+                    p_arg[1u] == a_ref_wday[i_wday][1u])
+                && (
+                    p_arg[2u] == a_ref_wday[i_wday][2u]))
+            {
+                b_found =
+                    1;
+            }
+            else
+            {
+                i_wday ++;
+            }
         }
     }
 

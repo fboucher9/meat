@@ -1,3 +1,15 @@
+/* See LICENSE for license details. */
+
+/*
+
+Module: meat_string.c
+
+Description:
+
+    String utility functions.
+
+*/
+
 #include "meat_os.h"
 
 #include "meat_string.h"
@@ -29,15 +41,13 @@ meat_string_skip_whitespace(
     unsigned char const * const
         p_buf,
     size_t const
-        i_buf_len,
-    size_t const
-        i_start_offset)
+        i_buf_len)
 {
     size_t
         i_offset;
 
     i_offset =
-        i_start_offset;
+        0u;
 
     while (
         (
@@ -56,19 +66,46 @@ meat_string_skip_whitespace(
 }
 
 size_t
-    meat_string_find_whitespace(
+    meat_string_trim_whitespace(
         unsigned char const * const
             p_buf,
         size_t const
-            i_buf_len,
-        size_t const
-            i_start_offset)
+            i_buf_len)
 {
     size_t
         i_offset;
 
     i_offset =
-        i_start_offset;
+        i_buf_len;
+
+    while (
+        (
+            0
+            != i_offset)
+        && (
+            meat_string_is_whitespace(
+                p_buf[i_offset - 1u])))
+    {
+        i_offset --;
+    }
+
+    return
+        i_offset;
+
+}
+
+size_t
+    meat_string_find_whitespace(
+        unsigned char const * const
+            p_buf,
+        size_t const
+            i_buf_len)
+{
+    size_t
+        i_offset;
+
+    i_offset =
+        0u;
 
     while (
         (
@@ -86,6 +123,37 @@ size_t
         i_offset;
 
 }
+
+size_t
+    meat_string_find_null(
+        unsigned char const * const
+            p_buf,
+        size_t const
+            i_buf_len)
+{
+    size_t
+        i_offset;
+
+    i_offset =
+        0u;
+
+    while (
+        (
+            i_offset
+            < i_buf_len)
+        &&
+            (
+                '\000'
+                != p_buf[i_offset]))
+    {
+        i_offset ++;
+    }
+
+    return
+        i_offset;
+
+
+} /* meat_string_find_null() */
 
 char
     meat_string_is_digit(
@@ -181,5 +249,62 @@ signed long int
         i_value;
 
 }
+
+signed int
+    meat_string_compare(
+        unsigned char const * const
+            p_buf_left,
+        size_t const
+            i_buf_left_len,
+        unsigned char const * const
+            p_buf_right,
+        size_t const
+            i_buf_right_len)
+{
+    int
+        i_result;
+
+    size_t
+        i_buf_iterator;
+
+    i_buf_iterator =
+        0u;
+
+    do
+    {
+        i_result =
+            (int)(
+                (int)(
+                    (
+                        i_buf_iterator
+                        < i_buf_left_len)
+                    ?  p_buf_left[i_buf_iterator]
+                    : '\0')
+                - (int)(
+                    (
+                        i_buf_iterator
+                        < i_buf_right_len)
+                    ? p_buf_right[i_buf_iterator]
+                    : '\0')
+                );
+
+        i_buf_iterator ++;
+    }
+    while (
+        (
+            (
+                i_buf_iterator
+                < i_buf_left_len)
+            || (
+                i_buf_iterator
+                < i_buf_right_len))
+        && (
+            0
+            == i_result));
+
+    return
+        i_result;
+
+} /* meat_string_compare() */
 
 /* end-of-file: meat_string.c */

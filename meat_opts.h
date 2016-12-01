@@ -39,7 +39,7 @@ void
             p_opts,
         unsigned int const
             i_argc,
-        char const * const * const
+        unsigned char const * const * const
             p_argv);
 
 #if defined(__cplusplus)

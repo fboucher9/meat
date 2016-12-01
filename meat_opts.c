@@ -18,8 +18,127 @@ Description:
 
 #include "meat_string.h"
 
-/* For strcmp */
-#include <string.h>
+static unsigned char const g_word_today[] =
+{
+    't',
+    'o',
+    'd',
+    'a',
+    'y'
+};
+
+static unsigned char const g_word_tomorrow[] =
+{
+    't',
+    'o',
+    'm',
+    'o',
+    'r',
+    'r',
+    'o',
+    'w'
+};
+
+static unsigned char const g_word_yesterday[] =
+{
+    'y',
+    'e',
+    's',
+    't',
+    'e',
+    'r',
+    'd',
+    'a',
+    'y'
+};
+
+static unsigned char const g_word_this[] =
+{
+    't',
+    'h',
+    'i',
+    's'
+};
+
+static unsigned char const g_word_day[] =
+{
+    'd',
+    'a',
+    'y'
+};
+
+static unsigned char const g_word_week[] =
+{
+    'w',
+    'e',
+    'e',
+    'k'
+};
+
+static unsigned char const g_word_month[] =
+{
+    'm',
+    'o',
+    'n',
+    't',
+    'h'
+};
+
+static unsigned char const g_word_days[] =
+{
+    'd',
+    'a',
+    'y',
+    's'
+};
+
+static unsigned char const g_word_weeks[] =
+{
+    'w',
+    'e',
+    'e',
+    'k',
+    's'
+};
+
+static unsigned char const g_word_months[] =
+{
+    'm',
+    'o',
+    'n',
+    't',
+    'h',
+    's'
+};
+
+static unsigned char const g_word_next[] =
+{
+    'n',
+    'e',
+    'x',
+    't'
+};
+
+static unsigned char const g_word_last[] =
+{
+    'l',
+    'a',
+    's',
+    't'
+};
+
+static unsigned char const g_word_ago[] =
+{
+    'a',
+    'g',
+    'o'
+};
+
+static unsigned char const g_word_in[] =
+{
+    'i',
+    'n'
+};
 
 /*
 
@@ -49,7 +168,7 @@ void
             p_opts,
         unsigned int const
             i_argc,
-        char const * const * const
+        unsigned char const * const * const
             p_argv)
 {
     signed long int
@@ -63,6 +182,9 @@ void
 
     signed long int
         i_range_end;
+
+    size_t
+        p_argl[4u];
 
     int
         i_count;
@@ -84,6 +206,19 @@ void
     if (
         i_argc > 1)
     {
+        {
+            unsigned int
+                i_argi;
+
+            for (i_argi = 1; (i_argi < i_argc) && (i_argi < 4u); i_argi++)
+            {
+                p_argl[i_argi] =
+                    meat_string_find_null(
+                        p_argv[i_argi],
+                        ~0u);
+            }
+        }
+
         i_range_begin =
             i_now;
 
@@ -106,46 +241,47 @@ void
         /* in [N] month(s) */
         /* next|last|this Monday... */
         /* next|last|this October... */
-        if (0 == strcmp(p_argv[1], "today"))
+
+        if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_today, sizeof(g_word_today)))
         {
             meat_time_single_day_range(
                 i_now,
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (0 == strcmp(p_argv[1], "tomorrow"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_tomorrow, sizeof(g_word_tomorrow)))
         {
             meat_time_single_day_range(
                 i_now + meat_time_offset_days(1),
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (0 == strcmp(p_argv[1], "yesterday"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_yesterday, sizeof(g_word_yesterday)))
         {
             meat_time_single_day_range(
                 i_now - meat_time_offset_days(1),
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (0 == strcmp(p_argv[1], "this"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_this, sizeof(g_word_this)))
         {
             if (i_argc > 2)
             {
-                if (0 == strcmp(p_argv[2], "day"))
+                if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_day, sizeof(g_word_day)))
                 {
                     meat_time_single_day_range(
                         i_now,
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "week"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_week, sizeof(g_word_week)))
                 {
                     meat_time_single_week_range(
                         i_now,
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "month"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_month, sizeof(g_word_month)))
                 {
                     meat_time_single_month_range(
                         i_now,
@@ -154,25 +290,25 @@ void
                 }
             }
         }
-        else if (0 == strcmp(p_argv[1], "next"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_next, sizeof(g_word_next)))
         {
             if (i_argc > 2)
             {
-                if (0 == strcmp(p_argv[2], "day"))
+                if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_day, sizeof(g_word_day)))
                 {
                     meat_time_single_day_range(
                         i_now + meat_time_offset_days(1),
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "week"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_week, sizeof(g_word_week)))
                 {
                     meat_time_single_week_range(
                         i_now + meat_time_offset_weeks(1),
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "month"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_month, sizeof(g_word_month)))
                 {
                     meat_time_single_month_range(
                         meat_time_find_middle_of_month(i_now, 1),
@@ -183,14 +319,12 @@ void
                 {
                     i_count =
                         meat_string_scan_decimal(
-                            (unsigned char *)(
-                                p_argv[2u]),
-                            (size_t)(
-                                strlen(
-                                    p_argv[2u])));
+                            p_argv[2u],
+                            p_argl[2u]);
+
                     if (i_argc > 3)
                     {
-                        if ((i_count > 1) && (0 == strcmp(p_argv[3], "days")))
+                        if ((i_count > 1) && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_days, sizeof(g_word_days))))
                         {
                             meat_time_align_range_to_day(
                                 i_now + meat_time_offset_days(1),
@@ -198,7 +332,7 @@ void
                                 &i_range_begin,
                                 &i_range_end);
                         }
-                        else if ((i_count > 1) && (0 == strcmp(p_argv[3], "weeks")))
+                        else if ((i_count > 1) && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_weeks, sizeof(g_word_weeks))))
                         {
                             meat_time_align_range_to_week(
                                 i_now + meat_time_offset_weeks(1),
@@ -206,7 +340,7 @@ void
                                 &i_range_begin,
                                 &i_range_end);
                         }
-                        else if ((i_count > 1) && (0 == strcmp(p_argv[3], "months")))
+                        else if ((i_count > 1) && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_months, sizeof(g_word_months))))
                         {
                             meat_time_align_range_to_month(
                                 meat_time_find_middle_of_month(i_now, 1),
@@ -216,7 +350,7 @@ void
                         }
                     }
                 }
-                else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[2])))
+                else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[2u], p_argl[2u])))
                 {
                     if (i_wday > o_time_now.i_day_of_week)
                     {
@@ -239,25 +373,25 @@ void
                 }
             }
         }
-        else if (0 == strcmp(p_argv[1], "last"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_last, sizeof(g_word_last)))
         {
             if (i_argc > 2)
             {
-                if (0 == strcmp(p_argv[2], "day"))
+                if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_day, sizeof(g_word_day)))
                 {
                     meat_time_single_day_range(
                         i_now - meat_time_offset_days(1),
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "week"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_week, sizeof(g_word_week)))
                 {
                     meat_time_single_week_range(
                         i_now - meat_time_offset_weeks(1),
                         &i_range_begin,
                         &i_range_end);
                 }
-                else if (0 == strcmp(p_argv[2], "month"))
+                else if (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_month, sizeof(g_word_month)))
                 {
                     meat_time_single_month_range(
                         meat_time_find_middle_of_month(i_now, -1),
@@ -268,16 +402,13 @@ void
                 {
                     i_count =
                         meat_string_scan_decimal(
-                            (unsigned char const *)(
-                                p_argv[2u]),
-                            (size_t)(
-                                strlen(
-                                    p_argv[2])));
+                            p_argv[2u],
+                            p_argl[2u]);
                     if (i_argc > 3)
                     {
                         if (i_count > 1)
                         {
-                            if (0 == strcmp(p_argv[3], "days"))
+                            if (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_days, sizeof(g_word_days)))
                             {
                                 meat_time_align_range_to_day(
                                     i_now - meat_time_offset_days(i_count),
@@ -285,7 +416,7 @@ void
                                     &i_range_begin,
                                     &i_range_end);
                             }
-                            else if (0 == strcmp(p_argv[3], "weeks"))
+                            else if (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_weeks, sizeof(g_word_weeks)))
                             {
                                 meat_time_align_range_to_week(
                                     i_now - meat_time_offset_weeks(i_count),
@@ -293,7 +424,7 @@ void
                                     &i_range_begin,
                                     &i_range_end);
                             }
-                            else if (0 == strcmp(p_argv[3], "months"))
+                            else if (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_months, sizeof(g_word_months)))
                             {
                                 meat_time_align_range_to_month(
                                     meat_time_find_middle_of_month(i_now, -i_count),
@@ -311,22 +442,20 @@ void
             /* */
             i_count =
                 meat_string_scan_decimal(
-                    (unsigned char const *)(
-                        p_argv[1u]),
-                    (size_t)(
-                        strlen(
-                            p_argv[1u])));
+                    p_argv[1u],
+                    p_argl[1u]);
+
             if (i_argc > 3)
             {
-                if (0 == strcmp(p_argv[3], "ago"))
+                if (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_ago, sizeof(g_word_ago)))
                 {
                     if (
                         (
                             (i_count > 1)
-                            && (0 == strcmp(p_argv[2], "days")))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_days, sizeof(g_word_days))))
                         || (
                             (i_count == 1)
-                            && (0 == strcmp(p_argv[2], "day"))))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_day, sizeof(g_word_day)))))
                     {
                         meat_time_single_day_range(
                             i_now - meat_time_offset_days(i_count),
@@ -336,10 +465,10 @@ void
                     else if (
                         (
                             (i_count > 1)
-                            && (0 == strcmp(p_argv[2], "weeks")))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_weeks, sizeof(g_word_weeks))))
                         || (
                             (i_count == 1)
-                            && (0 == strcmp(p_argv[2], "week"))))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_week, sizeof(g_word_week)))))
                     {
                         meat_time_single_week_range(
                             i_now - meat_time_offset_weeks(i_count),
@@ -349,10 +478,10 @@ void
                     else if (
                         (
                             (i_count > 1)
-                            && (0 == strcmp(p_argv[2], "months")))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_months, sizeof(g_word_months))))
                         || (
                             (i_count == 1)
-                            && (0 == strcmp(p_argv[2], "month"))))
+                            && (0 == meat_string_compare(p_argv[2u], p_argl[2u], g_word_month, sizeof(g_word_month)))))
                     {
                         meat_time_single_month_range(
                             meat_time_find_middle_of_month(i_now, -i_count),
@@ -362,7 +491,7 @@ void
                 }
             }
         }
-        else if (0 == strcmp(p_argv[1], "in"))
+        else if (0 == meat_string_compare(p_argv[1u], p_argl[1u], g_word_in, sizeof(g_word_in)))
         {
             if (i_argc > 2)
             {
@@ -370,20 +499,17 @@ void
                 {
                     i_count =
                         meat_string_scan_decimal(
-                            (unsigned char const *)(
-                                p_argv[2u]),
-                            (size_t)(
-                                strlen(
-                                    p_argv[2u])));
+                            p_argv[2u],
+                            p_argl[2u]);
                     if (i_argc > 3)
                     {
                         if (
                             (
                                 (i_count > 1)
-                                && (0 == strcmp(p_argv[3], "days")))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_days, sizeof(g_word_days))))
                             || (
                                 (i_count == 1)
-                                && (0 == strcmp(p_argv[3], "day"))))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_day, sizeof(g_word_day)))))
                         {
                             meat_time_single_day_range(
                                 i_now + meat_time_offset_days(i_count),
@@ -393,10 +519,10 @@ void
                         else if (
                             (
                                 (i_count > 1)
-                                && (0 == strcmp(p_argv[3], "weeks")))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_weeks, sizeof(g_word_weeks))))
                             || (
                                 (i_count == 1)
-                                && (0 == strcmp(p_argv[3], "week"))))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_week, sizeof(g_word_week)))))
                         {
                             meat_time_single_week_range(
                                 i_now + meat_time_offset_weeks(i_count),
@@ -406,10 +532,10 @@ void
                         else if (
                             (
                                 (i_count > 1)
-                                && (0 == strcmp(p_argv[3], "months")))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_months, sizeof(g_word_months))))
                             || (
                                 (i_count == 1)
-                                && (0 == strcmp(p_argv[3], "month"))))
+                                && (0 == meat_string_compare(p_argv[3u], p_argl[3u], g_word_month, sizeof(g_word_month)))))
                         {
                             meat_time_single_month_range(
                                 meat_time_find_middle_of_month(i_now, i_count),
@@ -420,7 +546,7 @@ void
                 }
             }
         }
-        else if (-1 != (i_month = meat_time_which_month(p_argv[1])))
+        else if (-1 != (i_month = meat_time_which_month(p_argv[1u], p_argl[1u])))
         {
             signed long int
                 i_random_day_of_month;
@@ -461,7 +587,7 @@ void
                 &i_range_begin,
                 &i_range_end);
         }
-        else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[1])))
+        else if (-1 != (i_wday = meat_time_which_day_of_week(p_argv[1u], p_argl[1u])))
         {
             meat_time_single_day_range(
                 i_now
