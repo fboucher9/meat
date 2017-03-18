@@ -107,7 +107,7 @@ signed long int
         0;
 
     o_descriptor.tm_isdst =
-        0;
+        -1;
 
     return
         (signed long int)(
